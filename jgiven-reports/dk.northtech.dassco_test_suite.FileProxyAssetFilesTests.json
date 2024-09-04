@@ -1,0 +1,188 @@
+{
+  "className": "dk.northtech.dassco_test_suite.FileProxyAssetFilesTests",
+  "name": "File Proxy Asset Files",
+  "scenarios": [
+    {
+      "className": "dk.northtech.dassco_test_suite.FileProxyAssetFilesTests",
+      "testMethodName": "test_delete_local_files",
+      "description": "test delete local files",
+      "tagIds": [],
+      "explicitParameters": [],
+      "derivedParameters": [],
+      "scenarioCases": [
+        {
+          "caseNr": 1,
+          "steps": [
+            {
+              "name": "setup",
+              "words": [
+                {
+                  "value": "Given",
+                  "isIntroWord": true
+                },
+                {
+                  "value": "setup"
+                },
+                {
+                  "value": "https://dassco.dk/file_proxy/api",
+                  "argumentInfo": {
+                    "argumentName": "fileProxyUrl",
+                    "formattedValue": "https://dassco.dk/file_proxy/api"
+                  }
+                },
+                {
+                  "value": "https://dassco.dk/ars/api",
+                  "argumentInfo": {
+                    "argumentName": "assetServiceUrl",
+                    "formattedValue": "https://dassco.dk/ars/api"
+                  }
+                },
+                {
+                  "value": "https://dassco.dk/ars",
+                  "argumentInfo": {
+                    "argumentName": "assetServiceHealth",
+                    "formattedValue": "https://dassco.dk/ars"
+                  }
+                },
+                {
+                  "value": "https://dassco.dk/keycloak",
+                  "argumentInfo": {
+                    "argumentName": "keycloakHostname",
+                    "formattedValue": "https://dassco.dk/keycloak"
+                  }
+                },
+                {
+                  "value": "test-suite-service-user",
+                  "argumentInfo": {
+                    "argumentName": "clientId",
+                    "formattedValue": "test-suite-service-user"
+                  }
+                },
+                {
+                  "value": "Fv3gW0iNT3df18fI9leO0T8X2xBPkaqj",
+                  "argumentInfo": {
+                    "argumentName": "clientSecret",
+                    "formattedValue": "Fv3gW0iNT3df18fI9leO0T8X2xBPkaqj"
+                  }
+                },
+                {
+                  "value": "test-suite-read-role-1",
+                  "argumentInfo": {
+                    "argumentName": "readRole1ClientId",
+                    "formattedValue": "test-suite-read-role-1"
+                  }
+                },
+                {
+                  "value": "kNOJSPevCAOm35L9SfvwbPuCm6k7mJ8J",
+                  "argumentInfo": {
+                    "argumentName": "readRole1ClientSecret",
+                    "formattedValue": "kNOJSPevCAOm35L9SfvwbPuCm6k7mJ8J"
+                  }
+                },
+                {
+                  "value": "test-suite-write-role-1",
+                  "argumentInfo": {
+                    "argumentName": "writeRole1ClientId",
+                    "formattedValue": "test-suite-write-role-1"
+                  }
+                },
+                {
+                  "value": "rcxu0MZmG1joV5QMbPHLyhBwbky9pqVq",
+                  "argumentInfo": {
+                    "argumentName": "writeRole1ClientSecret",
+                    "formattedValue": "rcxu0MZmG1joV5QMbPHLyhBwbky9pqVq"
+                  }
+                }
+              ],
+              "status": "PASSED",
+              "durationInNanos": 9125500,
+              "depth": 0,
+              "parentFailed": false
+            },
+            {
+              "name": "dassco asset service server is up",
+              "words": [
+                {
+                  "value": "Given",
+                  "isIntroWord": true
+                },
+                {
+                  "value": "dassco asset service server is up"
+                }
+              ],
+              "status": "PASSED",
+              "durationInNanos": 225260400,
+              "depth": 0,
+              "parentFailed": false
+            },
+            {
+              "name": "a DELETE request is sent to delete an assets metadata",
+              "words": [
+                {
+                  "value": "When",
+                  "isIntroWord": true
+                },
+                {
+                  "value": "a DELETE request is sent to delete an assets metadata"
+                },
+                {
+                  "value": "test-suite-asset-zip-csv-file",
+                  "argumentInfo": {
+                    "argumentName": "asset_guid",
+                    "formattedValue": "test-suite-asset-zip-csv-file"
+                  }
+                }
+              ],
+              "status": "PASSED",
+              "durationInNanos": 1610205300,
+              "depth": 0,
+              "parentFailed": false
+            },
+            {
+              "name": "get status code",
+              "words": [
+                {
+                  "value": "When",
+                  "isIntroWord": true
+                },
+                {
+                  "value": "get status code"
+                }
+              ],
+              "status": "PASSED",
+              "durationInNanos": 426600,
+              "depth": 0,
+              "parentFailed": false
+            },
+            {
+              "name": "response is 204",
+              "words": [
+                {
+                  "value": "response is 204"
+                },
+                {
+                  "value": "204",
+                  "argumentInfo": {
+                    "argumentName": "statusCode",
+                    "formattedValue": "204"
+                  }
+                }
+              ],
+              "status": "PASSED",
+              "durationInNanos": 4120000,
+              "depth": 0,
+              "parentFailed": false
+            }
+          ],
+          "explicitArguments": [],
+          "derivedArguments": [],
+          "status": "SUCCESS",
+          "durationInNanos": 2142220600
+        }
+      ],
+      "casesAsTable": false,
+      "durationInNanos": 2142220600
+    }
+  ],
+  "tagMap": {}
+}
