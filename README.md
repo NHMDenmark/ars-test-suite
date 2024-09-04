@@ -16,3 +16,29 @@ The test suite uses service-user, WRITE_test-suite-role-1 and READ_test-suite-ro
 ## Application.properties file:
 In application.properties file, the environmental variables are set for fileproxy, assetservice, keycloak, and client id and secret for service user, write role 1 and read role 1. Please set them accordingly.
 
+`fileproxy.url=${FILEPROXY_LOCATION:}` FileProxy URL (can be either local or on the server)
+
+`assetservice.url=${ASSETSERVICE_LOCATION:}` AssetService URL
+
+`assetservice.health=${ASSETSERVICE_HEALTH:}` AssetService Health Endpoint
+
+`keycloak.hostname=${KEYCLOAK_LOCATION:}` Keycloak URL
+
+`spring.config.import=optional:file:./application-local.properties` An Application-Local Properties is needed to manage the clients and their secrets
+
+`test-asset=test-suite-main-asset` The main asset created by the test suite, present in many tests. In Application Properties to allow the user to choose the name they want for it.
+
+## Application-local.properties file:
+Has to be located in the root folder.
+
+`client.id=${CLIENT_ID:}`
+
+`client.secret=${CLIENT_SECRET:}`
+
+`read.role.1.client.id=${READ_ROLE_1_CLIENT_ID:}`
+
+`read.role.1.client.secret=${READ_ROLE_1_CLIENT_SECRET:}`
+
+`write.role.1.client.id=${WRITE_ROLE_1_CLIENT_ID:}`
+
+`write.role.1.client.secret=${WRITE_ROLE_1_CLIENT_SECRET:}`

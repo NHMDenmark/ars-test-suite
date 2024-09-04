@@ -267,13 +267,17 @@ public class FileProxyAssetFilesTests extends BaseTest<GivenState, WhenAction, T
     }
 
     @Test
-    @Order(Integer.MAX_VALUE)
+    @Order(Integer.MAX_VALUE - 1)
     public void test_delete_local_files() throws JSONException {
         logger.info("Deleting temp folder:");
         given().dassco_file_proxy_server_is_up();
         when().a_DELETE_request_is_sent_to_delete_temp_folder();
         then().response_is_204(when().getStatusCode());
+    }
 
+    @Test
+    @Order(Integer.MAX_VALUE)
+    public void test_delete_asset(){
         given().dassco_asset_service_server_is_up();
         when().a_DELETE_request_is_sent_to_delete_an_assets_metadata("test-suite-asset-zip-csv-file");
         then().response_is_204(when().getStatusCode());

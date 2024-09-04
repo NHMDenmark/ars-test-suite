@@ -24,6 +24,7 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
     @Test
     @Order(0)
     public void setup_assets(){
+        logger.info("Creating test-suite-asset-group-1");
         given().dassco_asset_service_server_is_up();
         when().a_POST_request_is_sent_to_create_an_assets_metadata_different_institutions("test-suite-asset-group-1", false, "test-suite-institution", "test-suite-collection", "test-suite-pipeline", "test-suite-workstation");
         then().response_is_200(when().getStatusCode());
@@ -32,6 +33,7 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
     @Test
     @Order(1)
     public void setup_asset_2(){
+        logger.info("Creating test-suite-asset-group-2");
         given().dassco_asset_service_server_is_up();
         when().a_POST_request_is_sent_to_create_an_assets_metadata_different_institutions("test-suite-asset-group-2", false, "test-suite-institution-2", "test-suite-collection-2", "test-suite-pipeline-2", "test-suite-workstation-2");
         then().response_is_200(when().getStatusCode());
@@ -40,6 +42,7 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
     @Test
     @Order(2)
     public void setup_asset_3(){
+        logger.info("Creating test-suite-asset-group-3");
         given().dassco_asset_service_server_is_up();
         when().a_POST_request_is_sent_to_create_an_assets_metadata_different_institutions("test-suite-asset-group-3", false, "test-suite-institution-2", "test-suite-collection-2", "test-suite-pipeline-2", "test-suite-workstation-2");
         then().response_is_200(when().getStatusCode());
@@ -48,6 +51,7 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
     @Test
     @Order(3)
     public void setup_asset_4(){
+        logger.info("Creating test-suite-asset-group-4");
         given().dassco_asset_service_server_is_up();
         when().a_POST_request_is_sent_to_create_an_assets_metadata_different_institutions("test-suite-asset-group-4", false, "test-suite-institution-3", "test-suite-collection-3", "test-suite-pipeline-3", "test-suite-workstation-3");
         then().response_is_200(when().getStatusCode());
@@ -56,6 +60,7 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
     @Test
     @Order(4)
     public void setup_asset_5(){
+        logger.info("Creating test-suite-asset-group-5");
         given().dassco_asset_service_server_is_up();
         when().a_POST_request_is_sent_to_create_an_assets_metadata_different_institutions("test-suite-asset-group-5", false, "test-suite-institution-3", "test-suite-collection-3", "test-suite-pipeline-3", "test-suite-workstation-3");
         then().response_is_200(when().getStatusCode());
@@ -64,12 +69,14 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
     @Test
     // Service user can create a group with restricted access:
     public void test_create_asset_group_service_user(){
+        logger.info("Create asset group with Service User");
         given().dassco_asset_service_server_is_up();
         List<String> assets = new ArrayList<>();
         assets.add("test-suite-asset-group-2");
         when().a_POST_request_is_sent_to_create_an_asset_group("test-suite-asset-group-1", assets, false);
         then().response_is_200(when().getStatusCode());
 
+        logger.info("Deleting asset group:");
         when().a_DELETE_request_is_sent_to_delete_an_asset_group("test-suite-asset-group-1");
         then().response_is_204(when().getStatusCode());
     }
@@ -77,18 +84,21 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
     @Test
     // Role 1 can create a Group with assets that have role 1:
     public void test_create_asset_group_read_role_1(){
+        logger.info("Creating asset group for Read Role 1:");
         given().dassco_asset_service_server_is_up();
         List<String> assets = new ArrayList<>();
         assets.add("test-suite-asset-group-2");
         when().a_POST_request_is_sent_to_create_an_asset_group_read_role_1("testCreateAssetGroupReadRole1", assets, false);
         then().response_is_200(when().getStatusCode());
 
+        logger.info("Deleting asset group:");
         when().a_DELETE_request_is_sent_to_delete_an_asset_group_read_role_1("testCreateAssetGroupReadRole1");
         then().response_is_204(when().getStatusCode());
     }
 
     @Test
     public void test_fail_create_asset_group_forbidden(){
+        logger.info("Failing creation of asset group: Forbidden");
         given().dassco_asset_service_server_is_up();
         List<String> assets = new ArrayList<>();
         assets.add("test-suite-asset-group-4");
@@ -98,18 +108,21 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
 
     @Test
     public void test_create_asset_group_shared_service_user(){
+        logger.info("Creating shared asset group:");
         given().dassco_asset_service_server_is_up();
         List<String> assets = new ArrayList<>();
         assets.add("test-suite-asset-group-4");
         when().a_POST_request_is_sent_to_create_an_asset_group("testCreateAssetGroupSharedServiceUser", assets, true);
         then().response_is_200(when().getStatusCode());
 
+        logger.info("Deleting asset group:");
         when().a_DELETE_request_is_sent_to_delete_an_asset_group("testCreateAssetGroupSharedServiceUser");
         then().response_is_204(when().getStatusCode());
     }
 
     @Test
     public void fail_test_create_asset_group_shared_read_role(){
+        logger.info("Failing to create shared asset group:");
         given().dassco_asset_service_server_is_up();
         List<String> assets = new ArrayList<>();
         assets.add("test-suite-asset-group-2");
@@ -119,12 +132,14 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
 
     @Test
     public void test_create_asset_group_shared_write_role(){
+        logger.info("Creating shared asset group:");
         given().dassco_asset_service_server_is_up();
         List<String> assets = new ArrayList<>();
         assets.add("test-suite-asset-group-2");
         when().a_POST_request_is_sent_to_create_an_asset_group_write_role_1("testCreateAssetGroupSharedWriteRole", assets);
         then().response_is_200(when().getStatusCode());
 
+        logger.info("Deleting asset group:");
         when().a_DELETE_request_is_sent_to_delete_an_asset_group_write_role_1("testCreateAssetGroupSharedWriteRole");
         then().response_is_204(when().getStatusCode());
     }
@@ -193,6 +208,7 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
 
     @Test
     public void test_add_asset_to_asset_group_service_user(){
+        logger.info("Adding asset to an asset group as a Service User:");
         given().dassco_asset_service_server_is_up();
         List<String> assets = new ArrayList<>();
         assets.add("test-suite-asset-group-2");
@@ -209,6 +225,7 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
 
     @Test
     public void test_add_asset_to_asset_group_read_role_1(){
+        logger.info("Adding an asset to an asset group with Read Role:");
         given().dassco_asset_service_server_is_up();
         List<String> assets = new ArrayList<>();
         assets.add("test-suite-asset-group-2");
@@ -225,6 +242,7 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
 
     @Test
     public void test_add_asset_to_asset_group_write_role_1(){
+        logger.info("Adding an asset to a group with Write Role:");
         given().dassco_asset_service_server_is_up();
         List<String> assets = new ArrayList<>();
         assets.add("test-suite-asset-group-2");
@@ -241,6 +259,7 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
 
     @Test
     public void fail_test_add_asset_to_asset_group_service_user(){
+        logger.info("Failing to add an asset to a group as a Service User:");
         given().dassco_asset_service_server_is_up();
         List<String> assets = new ArrayList<>();
         assets.add("test-suite-asset-group-2");
@@ -290,6 +309,7 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
     // Remove assets: only creator (and service user) can do it.
     @Test
     public void test_remove_assets_from_asset_group_service_user(){
+        logger.info("Removing an asset from an asset group:");
         given().dassco_asset_service_server_is_up();
         List<String> assets = new ArrayList<>();
         assets.add("test-suite-asset-group-1");
@@ -307,6 +327,7 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
 
     @Test
     public void test_remove_assets_from_asset_group_read_1(){
+        logger.info("Removing assets from group with Read Role:");
         given().dassco_asset_service_server_is_up();
         List<String> assets = new ArrayList<>();
         assets.add("test-suite-asset-group-2");
@@ -324,6 +345,7 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
 
     @Test
     public void test_remove_assets_from_asset_group_write_1(){
+        logger.info("Removing assets from group as Write Role:");
         given().dassco_asset_service_server_is_up();
         List<String> assets = new ArrayList<>();
         assets.add("test-suite-asset-group-2");
@@ -341,6 +363,7 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
 
     @Test
     public void fail_test_remove_assets_from_asset_group_forbidden(){
+        logger.info("Failing to remove assets from groups: Forbidden.");
         given().dassco_asset_service_server_is_up();
         List<String> assets = new ArrayList<>();
         assets.add("test-suite-asset-group-2");
@@ -391,6 +414,7 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
 
     @Test
     public void test_grant_access_to_asset_group_service_user(){
+        logger.info("Granting access to asset group as a Service User:");
         given().dassco_asset_service_server_is_up();
         List<String> assets = new ArrayList<>();
         List<String> users = new ArrayList<>();
@@ -408,6 +432,7 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
 
     @Test
     public void fail_test_grant_access_to_asset_group_read_1(){
+        logger.info("Failing to grant access to asset group as a Read Role User:");
         given().dassco_asset_service_server_is_up();
         List<String> assets = new ArrayList<>();
         List<String> users = new ArrayList<>();
@@ -425,6 +450,7 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
 
     @Test
     public void test_grant_access_to_asset_group_write_1(){
+        logger.info("Granting access to asset group as Write Role User:");
         given().dassco_asset_service_server_is_up();
         List<String> assets = new ArrayList<>();
         List<String> users = new ArrayList<>();
@@ -471,6 +497,7 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
 
     @Test
     public void revoke_access_to_asset_group_service_user(){
+        logger.info("Revoking access to asset group with Service User:");
         given().dassco_asset_service_server_is_up();
         List<String> assets = new ArrayList<>();
         List<String> users = new ArrayList<>();
@@ -488,6 +515,7 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
 
     @Test
     public void revoke_access_to_asset_group_write_1(){
+        logger.info("Removing access to asset group Write Role User:");
         given().dassco_asset_service_server_is_up();
         List<String> assets = new ArrayList<>();
         List<String> users = new ArrayList<>();
@@ -534,16 +562,67 @@ public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction
     }
 
     @Test
-    @Order(Integer.MAX_VALUE)
-    public void closeSharesAndDeleteAssets() throws JSONException {
-        for (int i = 1; i < 6; i ++){
-            logger.info("deleting asset : " + i);
-            when().a_DELETE_request_is_sent_to_delete_a_share("test-suite-asset-group-" + i);
-            then().response_is_200(when().getStatusCode())
-                    .and().http_allocation_status_returns_success(when().getShareHttpAllocationStatus());
+    @Order(Integer.MAX_VALUE - 4)
+    public void closeShareAndDeleteAsset1() throws JSONException {
+        given().dassco_file_proxy_server_is_up();
+        when().a_DELETE_request_is_sent_to_delete_a_share("test-suite-asset-group-1");
+        then().response_is_200(when().getStatusCode())
+                .and().http_allocation_status_returns_success(when().getShareHttpAllocationStatus());
 
-            when().a_DELETE_request_is_sent_to_delete_an_assets_metadata("test-suite-asset-group-" + i);
-            then().response_is_204(when().getStatusCode());
-        }
+        given().dassco_asset_service_server_is_up();
+        when().a_DELETE_request_is_sent_to_delete_an_assets_metadata("test-suite-asset-group-1");
+        then().response_is_204(when().getStatusCode());
+    }
+
+    @Test
+    @Order(Integer.MAX_VALUE - 3)
+    public void closeShareAndDeleteAsset2() throws JSONException {
+        given().dassco_file_proxy_server_is_up();
+        when().a_DELETE_request_is_sent_to_delete_a_share("test-suite-asset-group-2");
+        then().response_is_200(when().getStatusCode())
+                .and().http_allocation_status_returns_success(when().getShareHttpAllocationStatus());
+
+        given().dassco_asset_service_server_is_up();
+        when().a_DELETE_request_is_sent_to_delete_an_assets_metadata("test-suite-asset-group-2");
+        then().response_is_204(when().getStatusCode());
+    }
+
+    @Test
+    @Order(Integer.MAX_VALUE - 2)
+    public void closeShareAndDeleteAsset3() throws JSONException {
+        given().dassco_file_proxy_server_is_up();
+        when().a_DELETE_request_is_sent_to_delete_a_share("test-suite-asset-group-3");
+        then().response_is_200(when().getStatusCode())
+                .and().http_allocation_status_returns_success(when().getShareHttpAllocationStatus());
+
+        given().dassco_asset_service_server_is_up();
+        when().a_DELETE_request_is_sent_to_delete_an_assets_metadata("test-suite-asset-group-3");
+        then().response_is_204(when().getStatusCode());
+    }
+
+    @Test
+    @Order(Integer.MAX_VALUE - 1)
+    public void closeShareAndDeleteAsset4() throws JSONException {
+        given().dassco_file_proxy_server_is_up();
+        when().a_DELETE_request_is_sent_to_delete_a_share("test-suite-asset-group-4");
+        then().response_is_200(when().getStatusCode())
+                .and().http_allocation_status_returns_success(when().getShareHttpAllocationStatus());
+
+        given().dassco_asset_service_server_is_up();
+        when().a_DELETE_request_is_sent_to_delete_an_assets_metadata("test-suite-asset-group-4");
+        then().response_is_204(when().getStatusCode());
+    }
+
+    @Test
+    @Order(Integer.MAX_VALUE)
+    public void closeSharesAndDeleteAsset5() throws JSONException {
+        given().dassco_file_proxy_server_is_up();
+        when().a_DELETE_request_is_sent_to_delete_a_share("test-suite-asset-group-5");
+        then().response_is_200(when().getStatusCode())
+                .and().http_allocation_status_returns_success(when().getShareHttpAllocationStatus());
+
+        given().dassco_asset_service_server_is_up();
+        when().a_DELETE_request_is_sent_to_delete_an_assets_metadata("test-suite-asset-group-5");
+        then().response_is_204(when().getStatusCode());
     }
 }
