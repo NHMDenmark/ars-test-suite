@@ -42,3 +42,50 @@ Has to be located in the root folder.
 `write.role.1.client.id=${WRITE_ROLE_1_CLIENT_ID:}`
 
 `write.role.1.client.secret=${WRITE_ROLE_1_CLIENT_SECRET:}`
+
+## In case of Test Failure:
+The test suite closes shares and deletes asset metadata automatically, but in some cases there might be issues with this.
+If a test fails in the cleanup, it is recommended to take a note of the failed assets and close shares /  delete asset metadata automatically, as the Test Suite needs a "clean slate" to run again.
+
+This is the list of Assets created by the Test Suite in case they need to be checked individually:
+
+>test-suite-asset-group-1
+> 
+>test-suite-asset-group-2
+>test-suite-asset-group-3
+> 
+>test-suite-asset-group-4
+> 
+>test-suite-asset-group-5
+> 
+>test-suite-asset-created
+> 
+>test-suite-asset-updated
+> 
+>test-suite-asset-deleted
+> 
+>test-suite-asset-received
+> 
+>test-suite-asset-completed
+> 
+>test-suite-asset-audited
+> 
+>test-suite-asset-status
+> 
+>test-suite-asset-unlocked
+> 
+>test-suite-bulk-update-1
+> 
+>test-suite-bulk-update-2
+> 
+>bulk-update-errors-1
+> 
+>test-suite-asset-zip-csv-file
+> 
+>test-suite-main-asset
+> 
+>test-suite-asset-created-and-uploaded
+>
+>test-suite-asset-files-to-be-deleted
+>
+>test-suite-asset-file-to-delete-from-list
