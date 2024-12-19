@@ -89,3 +89,31 @@ This is the list of Assets created by the Test Suite in case they need to be che
 >test-suite-asset-files-to-be-deleted
 >
 >test-suite-asset-file-to-delete-from-list
+
+## Deployment
+As discussed, we need to be able to run the test suite via Github Actions.
+To do this, we need to move the following properties from application-local.properties to application.properties (if it has not been done before):
+
+```
+client.id=${CLIENT_ID:clientid}
+client.secret=${CLIENT_SECRET:clientsecret}
+
+read.role.1.client.id=${READ_ROLE_1_CLIENT_ID:readrole1clientid}
+read.role.1.client.secret=${READ_ROLE_1_CLIENT_SECRET:readrole1clientsecret}
+
+write.role.1.client.id=${WRITE_ROLE_1_CLIENT_ID:writerole1clientid}
+write.role.1.client.secret=${WRITE_ROLE_1_CLIENT_SECRET:writerole1clientsecret}
+```
+
+For security reasons, the ID's and Passwords are placeholders.
+For running the test suite and feeding the parameters, instead of running `mvn test`, we now need to pass the properties:
+
+```
+mvn test -Dproperty1=value1 -Dproperty2=value2
+```
+
+Spring Boot automatically merges these -D values into the environment and uses them to override matching keys in application.properties.
+It would end up looking something like this:
+```
+mvn test -DCLIENT_ID=actualClientId -DCLIENT_SECRET=actualClientSecret -DREAD_ROLE_1_CLIENT_ID=actualReadRole1ClientId -DREAD_ROLE_1_CLIENT_SECRET=actualReadRole1ClientSecret -DWRITE_ROLE_1_CLIENT_ID=actualWriteRole1ClientId -DWRITE_ROLE_1_CLIENT_SECRET=actualWriteRole1ClientSecret
+```
