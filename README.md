@@ -262,3 +262,40 @@ More work might be required to create the expected functionality of the test.
 The expected outcome of the test.
 Some tests are expected to work, some are expected to fail. In most of the cases we expect some specific statusCode, so after the WhenAction we would do `then().response_is_200(when().getStatusCode())` and pass the code that we got in the WhenAction. Sometimes, instead of Status Codes, we expect different Http Allocation Status (success, bad request) or internal status of assets, as well as number of elements in an array. What we expect depends on the test we are running.
 We currently have ThenOutcome ready for status code 200, 204, 400, 403, 404, 405, 500 and 507.
+
+### Creating new tests: Example 1
+
+Let's say that we have a new endpoint that needs testing. The endpoint is for the Asset Service, under /test-endpoint-1. It's a regular GET request.
+
+We will need to create new methods to accomodate the new test:
+
+Test method:
+```
+@Test
+public void test_new_endpoint_1() {
+    given().dassco_asset_service_server_is_up(); // Given: Dassco Asset Service needs to be up.
+    
+    when().a_GET_request_is_sent_to_test_the_new_endpoint() // When: We need to create this method in the WhenAction class.
+    
+    then().response_is_200(when().getStatusCode()); // We tell the test that we are expecting a 200 from the endpoint.
+}
+```
+
+a_GET_request_is_sent_to_test_the_new_endpoint method:
+```
+public WhenAction a_GET_request_is_sent_to_test_the_new_endpoint_method(){
+    getToken(); // To get the Keycloak token. Passing an incorrect token can lead to auth errors.
+    
+    request = HttpRequest.newBuilder() // create the request
+    .uri(URI.create(assetServiceUrl + "/v1/test-endpoint-1) // Pass the URL
+    .header("Content-Type, "application/json") // Add the headers
+    .header("Authorization", "Bearer " + token)
+    .GET() // Type of request
+    .build();
+    
+    makeApiCall(request); // Make the API call. There's a dedicated method that takes a request and makes the API call, saving the response.
+    
+    return self();
+}
+```
+
