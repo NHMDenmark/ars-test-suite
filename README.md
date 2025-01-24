@@ -299,3 +299,165 @@ public WhenAction a_GET_request_is_sent_to_test_the_new_endpoint_method(){
 }
 ```
 
+### Creating new tests, example 2:
+
+Now let's do a longer one. We need to do a POST request to an endpoint that needs a specific role, but we can only do it if the String we are trying to add does not exist beforehand.
+
+In ```application.properties```, we need to add the new role client id and secret. This has to match the ones in Keycloak.
+
+application.properties:
+```
+new.role.id=test-role
+new.role.password=test.password
+```
+
+Because we have a new role, we need to add it to the BaseTest class, so they can propagate to the other test classes and be used in methods there.
+
+BaseTest.java
+```
+@SpringBootTest
+public abstract class BaseTest<GivenType extends GivenState, WhenType extends WhenAction, ThenType extends ThenOutcome> extends ScenarioTest<GivenType, WhenType, ThenType> {
+
+// Other properties 
+@Value(${new.role.id})
+String testNewRoleID;
+
+@Value(${new.role.password})
+String testNewRolePassword;
+
+
+@BeforeEach
+    protected void setupScenario(){
+        given().setup(fileProxyUrl, assetServiceUrl, assetServiceHealth, keycloakHostname, clientId, clientSecret,
+                readRole1ClientId, readRole1ClientSecret, writeRole1ClientId, writeRole1ClientSecret, mainAsset,
+                testNewRoleID, testNewRolePassword); // Don't forget to add properties to the constructor!
+    }
+```
+
+Making that change means we also need to pass those properties in the GivenState class:
+
+GivenState.java
+```
+    public GivenState setup(String fileProxyUrl, String assetServiceUrl, String assetServiceHealth, String keycloakHostname,
+                            String clientId, String clientSecret, String readRole1ClientId, String readRole1ClientSecret,
+                            String writeRole1ClientId, String writeRole1ClientSecret, String mainAsset,
+                            String testNewRoleID, String testNewRolePassword){ // Add them here!
+        this.fileProxyUrl = fileProxyUrl;
+        this.assetServiceUrl = assetServiceUrl;
+        this.keycloakHostname = keycloakHostname;
+        this.assetServiceHealth = assetServiceHealth;
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+        this.readRole1ClientId = readRole1ClientId;
+        this.readRole1ClientSecret = readRole1ClientSecret;
+        this.writeRole1ClientId = writeRole1ClientId;
+        this.writeRole1ClientSecret = writeRole1ClientSecret;
+        this.mainAsset = mainAsset;
+        this.testNewRoleID = testNewRoleID; // And here!
+        this.testNewRolePassword = testNewRolePassword; // And here!
+        return self();
+    }
+```
+
+With this, the new properties are ready to be used.
+Now, if an endpoint uses those credentials, we need to add a getToken method for those roles.
+
+WhenAction.java
+```
+public void getTestToken(){
+    Map<String, String> requestBodyParams = new HashMap<>();
+        requestBodyParams.put("client_id", testNewRoleID); // Client ID here!
+        requestBodyParams.put("client_secret", testNewRolePassword); // Client Password here!
+        requestBodyParams.put("grant_type", "client_credentials");
+        requestBodyParams.put("scope", "openid");
+        String requestBody = requestBodyParams.entrySet().stream()
+                .map(e -> e.getKey() + "=" + e.getValue())
+                .reduce((p1, p2) -> p1 + "&" + p2)
+                .orElse("");
+
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(keycloakHostname + "/realms/dassco/protocol/openid-connect/token"))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+        
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                // Save the Token
+                JSONObject jsonResponse = new JSONObject(response.body());
+                token = jsonResponse.getString("access_token");
+            } else {
+                logger.error("Failed to obtain access token. HTTP Status: " + response.statusCode());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+}
+```
+
+Before doing the test, we need to check if the String we want to add exists or not, so we add a Condition in the Conditions class:
+
+Conditions.java
+```
+static boolean stringAlreadyExists(){
+    getToken();
+
+    request = HttpRequest.newBuilder()
+            .uri(URI.create(assetServiceUrl + "/v1/newTestMethod"))
+            .header("Authorization", "Bearer " + token)
+            .GET()
+            .build();
+    
+    try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 204){ 
+                return false; // It does not exist yet
+            } else if (response.statusCode() == 200) {
+                return true; // It does exist
+            }
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return true;    
+}
+```
+
+And now we can create the actual test method, which will use the Condition to evaluate if the Test can or cannot be run:
+
+Test Method:
+```
+@Test
+@DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#stringAlreadyExists") // Add the Condition method here!
+public void test_new_endpoint_2() {
+    given().dassco_asset_service_server_is_up(); // Given: Dassco Asset Service needs to be up.
+    
+    when().a_POST_request_is_sent_to_test_the_new_endpoint("test-String") // When: We need to create this method in the WhenAction class.
+    
+    then().response_is_200(when().getStatusCode()); // We tell the test that we are expecting a 200 from the endpoint.
+}
+```
+
+This also requires the POST method request to be created in WhenAction class:
+
+WhenAction.java
+```
+public WhenAction a_POST_request_is_sent_to_test_the_new_endpoint(String string){
+    getTestToken(); // Remember to use the appropriate token!
+    
+    request = HttpRequest.newBuilder()
+                .uri(URI.create(assetServiceUrl + "/v1/institutions/" + institution_name + "/collections"))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .POST(HttpRequest.BodyPublishers.ofString(string)) // Pass the body
+                .build();
+                
+    makeApiCall(request);
+
+    return self();
+}
+```
+
+And that will be it!
