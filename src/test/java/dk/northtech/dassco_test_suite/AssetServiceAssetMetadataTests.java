@@ -3,6 +3,8 @@ package dk.northtech.dassco_test_suite;
 import dk.northtech.dassco_test_suite.states.GivenState;
 import dk.northtech.dassco_test_suite.states.ThenOutcome;
 import dk.northtech.dassco_test_suite.states.WhenAction;
+import dk.northtech.dassco_test_suite.metadata_model.MetadataMapper;
+import dk.northtech.dassco_test_suite.metadata_model.Metadata;
 import org.json.JSONException;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -25,6 +27,11 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
 
     @Value("${test-asset}")
     private String mainAsset;
+
+    private MetadataMapper metaMapper = new MetadataMapper();
+
+    private Metadata parentModel = metaMapper.parent;
+    private Metadata derivativeModel = metaMapper.derivative;
 
     @Test
     @Order(0)
@@ -450,6 +457,56 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
         then().response_is_403(when().getStatusCode());
 
 
+    }
+
+    @Test
+    @Order(9)
+    @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#modelParentAssetAlreadyExists")
+    public void create_parent_metadata_from_model(){
+        // create parent model asset
+        logger.info("Creating parent asset from model.");
+        given().dassco_asset_service_server_is_up();
+        when().a_POST_request_is_sent_based_on_model_data_to_create_an_assets_metadata(this.parentModel);
+        then().response_is_200(when().getStatusCode()).and().asset_internal_status_is_metadata_received(when().getInternalStatus());
+    }
+
+    @Test
+    @Order(10)
+    @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#modelDerivativeAssetAlreadyExists")
+    public void create_derivative_metadata_from_model(){
+        // create derivative model asset
+        logger.info("Creating derivative asset from model.");
+        given().dassco_asset_service_server_is_up();
+        when().a_POST_request_is_sent_based_on_model_data_to_create_an_assets_metadata(this.derivativeModel);
+        then().response_is_200(when().getStatusCode()).and().asset_internal_status_is_metadata_received(when().getInternalStatus());
+    }
+
+    @Test
+    @Order(Integer.MAX_VALUE - 12)
+    public void close_share_and_delete_parent_model_asset() throws JSONException {
+        // delete share and metadata for derivative model asset
+        given().dassco_file_proxy_server_is_up();
+        when().a_DELETE_request_is_sent_to_delete_a_share(this.derivativeModel.getAsset_guid());
+        then().response_is_200(when().getStatusCode())
+                .and().http_allocation_status_returns_success(when().getShareHttpAllocationStatus());
+
+        given().dassco_asset_service_server_is_up();
+        when().a_DELETE_request_is_sent_to_delete_an_assets_metadata(this.derivativeModel.getAsset_guid());
+        then().response_is_204(when().getStatusCode());
+    }
+
+    @Test
+    @Order(Integer.MAX_VALUE - 11)
+    public void close_share_and_delete_derivative_model_asset() throws JSONException {
+        // delete share and metadata for parent model asset
+        given().dassco_file_proxy_server_is_up();
+        when().a_DELETE_request_is_sent_to_delete_a_share(this.parentModel.getAsset_guid());
+        then().response_is_200(when().getStatusCode())
+                .and().http_allocation_status_returns_success(when().getShareHttpAllocationStatus());
+
+        given().dassco_asset_service_server_is_up();
+        when().a_DELETE_request_is_sent_to_delete_an_assets_metadata(this.parentModel.getAsset_guid());
+        then().response_is_204(when().getStatusCode());
     }
 
     @Test

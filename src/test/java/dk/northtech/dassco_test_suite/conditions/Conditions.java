@@ -1,5 +1,7 @@
 package dk.northtech.dassco_test_suite.conditions;
 
+import dk.northtech.dassco_test_suite.metadata_model.MetadataMapper;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -31,6 +33,10 @@ public class Conditions {
 
     @Value("${test-asset}")
     private static String mainAsset;
+
+    private static MetadataMapper metaMapper = new MetadataMapper();
+    private static String parentGuid = metaMapper.parent.getAsset_guid();
+    private static String derivativeGuid = metaMapper.derivative.getAsset_guid();
 
     public static void init(Environment env){
         fileProxyUrl = env.getProperty("fileproxy.url");
@@ -380,6 +386,56 @@ public class Conditions {
         // Use Token to get Workstations for the test-suite-institution:
         request = HttpRequest.newBuilder()
                 .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/" + mainAsset))
+                .header("Authorization", "Bearer " + token)
+                .GET()
+                .build();
+
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200){
+                return true;
+            } else if(response.statusCode() == 204){
+                return false;
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return true;
+    }
+
+    static boolean modelParentAssetAlreadyExists(){
+
+        getToken();
+
+        // Use Token to get asset:
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/" + parentGuid))
+                .header("Authorization", "Bearer " + token)
+                .GET()
+                .build();
+
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200){
+                return true;
+            } else if(response.statusCode() == 204){
+                return false;
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return true;
+    }
+
+    static boolean modelDerivativeAssetAlreadyExists(){
+
+        getToken();
+
+        // Use Token to get asset:
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/" + derivativeGuid))
                 .header("Authorization", "Bearer " + token)
                 .GET()
                 .build();

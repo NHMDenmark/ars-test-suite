@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tngtech.jgiven.Stage;
 import com.tngtech.jgiven.annotation.ProvidedScenarioState;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,6 +23,8 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import dk.northtech.dassco_test_suite.metadata_model.Metadata;
 
 
 public class WhenAction extends Stage<WhenAction> {
@@ -264,6 +267,33 @@ public class WhenAction extends Stage<WhenAction> {
         getToken();
 
         String body = "{\"asset_pid\":\"test-suite-asset-pid\", \"asset_guid\":\"" + asset_guid + "\", \"status\":\"WORKING_COPY\", \"institution\":\"test-suite-institution\", \"collection\":\"test-suite-collection\", \"pipeline\":\"test-suite-pipeline\", \"workstation\": \"test-suite-workstation\", \"digitiser\":\"test-suite\", \"asset_locked\": " + locked + " }";
+
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/?allocation_mb=10"))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+
+        makeApiCall(request);
+
+        return self();
+    }
+
+    public WhenAction a_POST_request_is_sent_based_on_model_data_to_create_an_assets_metadata(Metadata model){
+        // Create a new asset based on model data
+
+        getToken();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String body;
+        try {
+            body = mapper.writeValueAsString(model);
+        } 
+        catch (JsonProcessingException e) {
+            e.printStackTrace();
+            body = "{}";
+        }
 
         request = HttpRequest.newBuilder()
                 .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/?allocation_mb=10"))
