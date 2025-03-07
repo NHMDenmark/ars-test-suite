@@ -14,7 +14,7 @@ public class Main {
         MetadataMapper mdata = new MetadataMapper();
         
         // check some specific value from metadata
-        String value = mdata.parent.getAsset_subject();
+        String value = mdata.parent.getAsset_guid();
         System.out.println(value);
        
         // check and print entire metadata as a json

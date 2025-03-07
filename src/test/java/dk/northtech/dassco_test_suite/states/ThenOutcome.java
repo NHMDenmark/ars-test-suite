@@ -1,16 +1,18 @@
 package dk.northtech.dassco_test_suite.states;
 
-import com.tngtech.jgiven.Stage;
-import com.tngtech.jgiven.annotation.ProvidedScenarioState;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-import static org.junit.Assert.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import com.tngtech.jgiven.Stage;
+import com.tngtech.jgiven.annotation.ProvidedScenarioState;
 
 public class ThenOutcome extends Stage<ThenOutcome> {
 
@@ -32,6 +34,10 @@ public class ThenOutcome extends Stage<ThenOutcome> {
     // ENV VARIABLES:
     @ProvidedScenarioState
     String assetServiceUrl;
+
+    // Created variable
+    @ProvidedScenarioState
+    Boolean compareResult;
 
     public ThenOutcome response_is_200(int statusCode){
         assertEquals("OK. Expected Code: 200", 200, statusCode);
@@ -176,6 +182,16 @@ public class ThenOutcome extends Stage<ThenOutcome> {
 
     public ThenOutcome asset_status_is_completed(String status){
         assertEquals("COMPLETED", status);
+        return self();
+    }
+
+    public ThenOutcome response_is_true(){
+        assertTrue(compareResult);
+        return self();
+    }
+
+    public ThenOutcome response_is_false(){
+        assertFalse(compareResult);
         return self();
     }
 }

@@ -1,18 +1,19 @@
 package dk.northtech.dassco_test_suite.states;
 
-import com.tngtech.jgiven.Stage;
-import com.tngtech.jgiven.annotation.ProvidedScenarioState;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.tngtech.jgiven.Stage;
+import com.tngtech.jgiven.annotation.ProvidedScenarioState;
 
 public class GivenState extends Stage<GivenState> {
 
@@ -51,9 +52,13 @@ public class GivenState extends Stage<GivenState> {
     @ProvidedScenarioState
     private String mainAsset;
 
+    // Created variable
+    @ProvidedScenarioState
+    private Boolean compareResult;
+
     public GivenState setup(String fileProxyUrl, String assetServiceUrl, String assetServiceHealth, String keycloakHostname,
                             String clientId, String clientSecret, String readRole1ClientId, String readRole1ClientSecret,
-                            String writeRole1ClientId, String writeRole1ClientSecret, String mainAsset){
+                            String writeRole1ClientId, String writeRole1ClientSecret, String mainAsset, Boolean compareResult){
         this.fileProxyUrl = fileProxyUrl;
         this.assetServiceUrl = assetServiceUrl;
         this.keycloakHostname = keycloakHostname;
@@ -65,6 +70,7 @@ public class GivenState extends Stage<GivenState> {
         this.writeRole1ClientId = writeRole1ClientId;
         this.writeRole1ClientSecret = writeRole1ClientSecret;
         this.mainAsset = mainAsset;
+        this.compareResult = compareResult;
         return self();
     }
 

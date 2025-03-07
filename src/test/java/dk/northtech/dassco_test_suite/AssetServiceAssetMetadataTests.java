@@ -1,10 +1,8 @@
 package dk.northtech.dassco_test_suite;
 
-import dk.northtech.dassco_test_suite.states.GivenState;
-import dk.northtech.dassco_test_suite.states.ThenOutcome;
-import dk.northtech.dassco_test_suite.states.WhenAction;
-import dk.northtech.dassco_test_suite.metadata_model.MetadataMapper;
-import dk.northtech.dassco_test_suite.metadata_model.Metadata;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.json.JSONException;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -16,8 +14,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
-import java.util.List;
+import dk.northtech.dassco_test_suite.metadata_model.Metadata;
+import dk.northtech.dassco_test_suite.metadata_model.MetadataMapper;
+import dk.northtech.dassco_test_suite.states.GivenState;
+import dk.northtech.dassco_test_suite.states.ThenOutcome;
+import dk.northtech.dassco_test_suite.states.WhenAction;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -455,8 +456,6 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
         given().dassco_asset_service_server_is_up();
         when().a_PUT_request_is_sent_to_fail_bulk_update_assets(assetGuids, true, true, false,false, false);
         then().response_is_403(when().getStatusCode());
-
-
     }
 
     @Test
@@ -482,9 +481,25 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
     }
 
     @Test
+    public void compare_parent_model_data_with_ars_entry(){
+        logger.info("Compare inserted parent data from asset parent model with ars data.");
+        given().dassco_asset_service_server_is_up();
+        when().compare_model_data_to_asset_in_ars(metaMapper.parentString);
+        then().response_is_true();
+    }
+
+    @Test
+    public void compare_derivative_model_data_with_ars_entry(){
+        logger.info("Compare inserted derivative data from asset parent model with ars data.");
+        given().dassco_asset_service_server_is_up();
+        when().compare_model_data_to_asset_in_ars(metaMapper.derivativeString);
+        then().response_is_true();
+    }
+
+    @Test
     @Order(Integer.MAX_VALUE - 12)
-    public void close_share_and_delete_parent_model_asset() throws JSONException {
-        // delete share and metadata for derivative model asset
+    public void close_share_and_delete_derivative_model_asset() throws JSONException {
+        // delete share and metadata for parent model asset
         given().dassco_file_proxy_server_is_up();
         when().a_DELETE_request_is_sent_to_delete_a_share(this.derivativeModel.getAsset_guid());
         then().response_is_200(when().getStatusCode())
@@ -497,8 +512,8 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
 
     @Test
     @Order(Integer.MAX_VALUE - 11)
-    public void close_share_and_delete_derivative_model_asset() throws JSONException {
-        // delete share and metadata for parent model asset
+    public void close_share_and_delete_parent_model_asset() throws JSONException {
+        // delete share and metadata for derivative model asset
         given().dassco_file_proxy_server_is_up();
         when().a_DELETE_request_is_sent_to_delete_a_share(this.parentModel.getAsset_guid());
         then().response_is_200(when().getStatusCode())

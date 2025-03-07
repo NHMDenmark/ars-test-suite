@@ -1,17 +1,6 @@
 package dk.northtech.dassco_test_suite.states;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tngtech.jgiven.Stage;
-import com.tngtech.jgiven.annotation.ProvidedScenarioState;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -21,8 +10,21 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tngtech.jgiven.Stage;
+import com.tngtech.jgiven.annotation.ProvidedScenarioState;
 
 import dk.northtech.dassco_test_suite.metadata_model.Metadata;
 
@@ -67,6 +69,13 @@ public class WhenAction extends Stage<WhenAction> {
     private String writeRole1ClientId;
     @ProvidedScenarioState
     private String writeRole1ClientSecret;
+
+    // Created state
+    @ProvidedScenarioState
+    private boolean compareResult;
+
+    // Objectmapper
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     // DASSCO-ASSET-SERVICE ENDPOINTS:
     public WhenAction a_POST_request_is_sent_to_create_an_institution_or_workstation_or_pipeline_or_collection(String entityType, String i_role, String c_role, String i_name, String c_name, String p_name, String w_name){
@@ -1978,6 +1987,104 @@ public class WhenAction extends Stage<WhenAction> {
         } catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public WhenAction compare_model_data_to_asset_in_ars(String model){
+
+        try {
+            
+            JsonNode model_data = convert_json_to_node(model); 
+            
+            String assetGuid = model_data.get("asset_guid").textValue();
+            
+            String ars_asset = get_asset_metadata(assetGuid);
+            
+            JsonNode asset_data = convert_json_to_node(ars_asset);
+            
+            this.compareResult =  model_and_asset_data_match(model_data, asset_data);
+            
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return self();
+    }
+
+    public String get_asset_metadata(String assetGuid){
+        
+        getToken();
+        
+        try {
+            String uriString = assetServiceUrl + "/v1/assetmetadata/" + assetGuid;
+            
+            request = HttpRequest.newBuilder()
+                    .uri(URI.create(uriString))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .GET()
+                    .build();
+        } catch(Exception e) {
+            logger.error("Error while creating URI: " + e.getMessage(), e);
+            throw e;
+        }
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            // logger.info(response.body());
+            return response.body();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return response.body();
+    }   
+
+    public JsonNode convert_json_to_node(String json) throws IOException{
+        JsonNode node = objectMapper.readTree(json);
+        return node;
+    }
+
+    /**
+     * Recursively compares the shared keys between two JSON nodes.
+     *
+     * @param model The first JSON is the model.
+     * @param asset The second JSON is the asset gotten from ARS.
+     * @return true if for every key that exists in both nodes the values are identical, false otherwise.
+     */
+    public Boolean model_and_asset_data_match(JsonNode model, JsonNode asset){
+    
+        // If both nodes are objects, compare keys that are shared
+        if (model.isObject() && asset.isObject()) {
+            Iterator<Map.Entry<String, JsonNode>> fields = model.fields();
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> entry = fields.next();
+                String key = entry.getKey();
+                // Only compare if the key exists in both nodes
+                if (asset.has(key) && key != "date_metadata_updated") {
+                    JsonNode value1 = entry.getValue();
+                    JsonNode value2 = asset.get(key);
+                    if (!model_and_asset_data_match(value1, value2)) {
+                        logger.error("Difference found for key: " + key);
+                        return false;
+                    }
+                }
+            }
+            return true;
+        } 
+        // If both nodes are arrays, compare each element in order
+        else if (model.isArray() && asset.isArray()) {
+            if (model.size() != asset.size()) {
+                return false;
+            }
+            for (int i = 0; i < model.size(); i++) {
+                if (!model_and_asset_data_match(model.get(i), model.get(i))) {
+                    return false;
+                }
+            }
+            return true;
+        } 
+        // For other types (string, number, boolean, null), compare them directly
+        else {
+            return model.equals(asset);
+        }    
     }
 
 }

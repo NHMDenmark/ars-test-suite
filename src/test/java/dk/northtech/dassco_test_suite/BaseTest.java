@@ -1,12 +1,14 @@
 package dk.northtech.dassco_test_suite;
 
-import com.tngtech.jgiven.junit5.ScenarioTest;
-import dk.northtech.dassco_test_suite.states.GivenState;
-import dk.northtech.dassco_test_suite.states.ThenOutcome;
-import dk.northtech.dassco_test_suite.states.WhenAction;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import com.tngtech.jgiven.junit5.ScenarioTest;
+
+import dk.northtech.dassco_test_suite.states.GivenState;
+import dk.northtech.dassco_test_suite.states.ThenOutcome;
+import dk.northtech.dassco_test_suite.states.WhenAction;
 
 @SpringBootTest
 public abstract class BaseTest<GivenType extends GivenState, WhenType extends WhenAction, ThenType extends ThenOutcome> extends ScenarioTest<GivenType, WhenType, ThenType> {
@@ -37,6 +39,6 @@ public abstract class BaseTest<GivenType extends GivenState, WhenType extends Wh
     @BeforeEach
     protected void setupScenario(){
         given().setup(fileProxyUrl, assetServiceUrl, assetServiceHealth, keycloakHostname, clientId, clientSecret,
-                readRole1ClientId, readRole1ClientSecret, writeRole1ClientId, writeRole1ClientSecret, mainAsset);
+                readRole1ClientId, readRole1ClientSecret, writeRole1ClientId, writeRole1ClientSecret, mainAsset, false);
     }
 }
