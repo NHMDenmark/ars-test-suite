@@ -142,6 +142,11 @@ For example, workflow test 1 creates an Asset, uploads a file, synchronizes ERDA
 ### Cleanup tests
 Cleanup tests take care of closing shares and deleting assets so the test suite can be re-run.
 
+### Metadata field tests
+Additional tests for checking that metadata fields are correctly added and updated in ARS has been added to the AssetServiceAssetMetadataTests.  
+These tests have configurable data that can be changed in the resources/non_static folder. The metadata_model/MetadataMapper file then have to have its file paths changed to the relevant jsons. When switching between metadata versions further changes may be necessary and creation of a new model may also be necessary. Change between the models in the metadata_model/Metadata and metadata_model/UpdateMetadata files. For comparing and checking that the created and updated metadata is correct changes may have to be made in the model_and_asset_data_match method in states/WhenAction file.  
+Currently data exists for metadata v2_1_0 and v3.0.0.  
+
 ### Other tests:
 Each section of the FileProxy and AssetService has their own class for tests (for example: Asset Service Asset Groups test -> tests pertaining the Asset Group functionality of the Asset Service, File Proxy Asset Files test -> tests pertaining the Asset Files in the File Proxy).
 Future tests should follow this convention to maintain order.
