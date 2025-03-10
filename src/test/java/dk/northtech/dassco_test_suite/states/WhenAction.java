@@ -2009,9 +2009,46 @@ public class WhenAction extends Stage<WhenAction> {
 
         return self();
     }
+    
+    public WhenAction compare_update_data_to_asset_in_ars(String model){
+
+        try {
+            
+            JsonNode model_data = convert_json_to_node(model); 
+            
+            String assetGuid = model_data.get("asset_guid").textValue();
+            
+            String ars_asset = get_asset_metadata(assetGuid);
+            
+            JsonNode asset_data = convert_json_to_node(ars_asset);
+            
+            this.compareResult =  model_and_asset_data_match(model_data, asset_data);
+            
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return self();
+    }
+
+    public WhenAction update_asset_from_model(String model, String assetGuid){
+
+        getToken();        
+
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/" + assetGuid))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .PUT(HttpRequest.BodyPublishers.ofString(model))
+                .build();
+
+        makeApiCall(request);
+
+        return self();
+    }
 
     public String get_asset_metadata(String assetGuid){
-        
+
         getToken();
         
         try {
@@ -2057,8 +2094,8 @@ public class WhenAction extends Stage<WhenAction> {
             while (fields.hasNext()) {
                 Map.Entry<String, JsonNode> entry = fields.next();
                 String key = entry.getKey();
-                // Only compare if the key exists in both nodes
-                if (asset.has(key) && key != "date_metadata_updated") {
+                // Only compare if the key exists in both nodes - removed fields from being compared based on v2_1_0 bugs in ARS
+                if (asset.has(key) && key != "date_metadata_updated" && key != "updateUser") {
                     JsonNode value1 = entry.getValue();
                     JsonNode value2 = asset.get(key);
                     if (!model_and_asset_data_match(value1, value2)) {

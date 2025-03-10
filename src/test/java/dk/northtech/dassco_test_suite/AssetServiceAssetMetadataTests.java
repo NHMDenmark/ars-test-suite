@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import dk.northtech.dassco_test_suite.metadata_model.Metadata;
 import dk.northtech.dassco_test_suite.metadata_model.MetadataMapper;
+import dk.northtech.dassco_test_suite.metadata_model.UpdateMetadata;
 import dk.northtech.dassco_test_suite.states.GivenState;
 import dk.northtech.dassco_test_suite.states.ThenOutcome;
 import dk.northtech.dassco_test_suite.states.WhenAction;
@@ -30,9 +31,9 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
     private String mainAsset;
 
     private MetadataMapper metaMapper = new MetadataMapper();
-
     private Metadata parentModel = metaMapper.parent;
     private Metadata derivativeModel = metaMapper.derivative;
+    private UpdateMetadata updateParentModel = metaMapper.updateParent;
 
     @Test
     @Order(0)
@@ -465,7 +466,7 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
         // create parent model asset
         logger.info("Creating parent asset from model.");
         given().dassco_asset_service_server_is_up();
-        when().a_POST_request_is_sent_based_on_model_data_to_create_an_assets_metadata(this.parentModel);
+        when().a_POST_request_is_sent_based_on_model_data_to_create_an_assets_metadata(parentModel);
         then().response_is_200(when().getStatusCode()).and().asset_internal_status_is_metadata_received(when().getInternalStatus());
     }
 
@@ -476,11 +477,12 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
         // create derivative model asset
         logger.info("Creating derivative asset from model.");
         given().dassco_asset_service_server_is_up();
-        when().a_POST_request_is_sent_based_on_model_data_to_create_an_assets_metadata(this.derivativeModel);
+        when().a_POST_request_is_sent_based_on_model_data_to_create_an_assets_metadata(derivativeModel);
         then().response_is_200(when().getStatusCode()).and().asset_internal_status_is_metadata_received(when().getInternalStatus());
     }
 
     @Test
+    @Order(11)
     public void compare_parent_model_data_with_ars_entry(){
         logger.info("Compare inserted parent data from asset parent model with ars data.");
         given().dassco_asset_service_server_is_up();
@@ -488,6 +490,7 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
         then().response_is_true();
     }
 
+    @Order(12)
     @Test
     public void compare_derivative_model_data_with_ars_entry(){
         logger.info("Compare inserted derivative data from asset parent model with ars data.");
@@ -497,9 +500,22 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
     }
 
     @Test
+    public void update_parent_model_and_check_values(){
+        logger.info("Updating parent model with new values.");
+        given().dassco_asset_service_server_is_up();
+        when().update_asset_from_model(metaMapper.updateParentString, this.updateParentModel.getAsset_guid());
+        then().response_is_200(when().getStatusCode());
+
+        logger.info("Compare updated parent data from asset parent model with update data.");
+        given().dassco_asset_service_server_is_up();
+        when().compare_model_data_to_asset_in_ars(metaMapper.updateParentString);
+        then().response_is_true();
+    }
+
+    @Test
     @Order(Integer.MAX_VALUE - 12)
     public void close_share_and_delete_derivative_model_asset() throws JSONException {
-        // delete share and metadata for parent model asset
+        // delete share and metadata for derivative model asset
         given().dassco_file_proxy_server_is_up();
         when().a_DELETE_request_is_sent_to_delete_a_share(this.derivativeModel.getAsset_guid());
         then().response_is_200(when().getStatusCode())
@@ -513,7 +529,7 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
     @Test
     @Order(Integer.MAX_VALUE - 11)
     public void close_share_and_delete_parent_model_asset() throws JSONException {
-        // delete share and metadata for derivative model asset
+        // delete share and metadata for parent model asset
         given().dassco_file_proxy_server_is_up();
         when().a_DELETE_request_is_sent_to_delete_a_share(this.parentModel.getAsset_guid());
         then().response_is_200(when().getStatusCode())
