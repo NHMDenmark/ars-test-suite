@@ -387,9 +387,9 @@ public class WhenAction extends Stage<WhenAction> {
 
     public WhenAction a_PUT_request_is_sent_to_update_an_asset(){
 
-        // Minimum information for updating is: institution name, workstation, pipeline, collection, status and update user.
+        // Minimum information for updating is: institution, workstation, pipeline, collection, status and update user.
         // Then the Update field. We are testing if "funding" changes value (original = null, updated = "50000 kroner")
-        String body = "{\"institution\":\"test-suite-institution\", \"workstation\":\"test-suite-workstation\", \"pipeline\":\"test-suite-pipeline\", \"collection\":\"test-suite-collection\", \"status\":\"WORKING_COPY\", \"updateUser\":\"test-suite\", \"funding\":\"50000 kroner\", \"asset_locked\": true }";
+        String body = "{\"asset_guid\":\"test-suite-asset_updated\", \"institution\":\"test-suite-institution\", \"workstation\":\"test-suite-workstation\", \"pipeline\":\"test-suite-pipeline\", \"collection\":\"test-suite-collection\", \"status\":\"WORKING_COPY\", \"updateUser\":\"test-suite\", \"funding\":\"50000 kroner\", \"asset_locked\": true }";
 
         getToken();
 
@@ -407,7 +407,7 @@ public class WhenAction extends Stage<WhenAction> {
 
     public WhenAction a_PUT_request_is_sent_to_fail_the_update_an_asset(String asset_guid, String institution, String workstation, String pipeline, String collection, String status, String updateUser, boolean asset_locked){
 
-        String body = "{\"institution\":\"" + institution + "\", \"workstation\":\"" + workstation + "\", \"pipeline\":\"" + pipeline + "\", \"collection\":\"" + collection + "\", \"status\":\"" + status + "\", \"updateUser\":\"" + updateUser + "\", \"asset_locked\": \"" + asset_locked + "\"}";
+        String body = "{\"asset_guid\":\"" + asset_guid + "\", \"institution\":\"" + institution + "\", \"workstation\":\"" + workstation + "\", \"pipeline\":\"" + pipeline + "\", \"collection\":\"" + collection + "\", \"status\":\"" + status + "\", \"updateUser\":\"" + updateUser + "\", \"asset_locked\":" + asset_locked  + "}";
 
         getToken();
 
@@ -2094,7 +2094,7 @@ public class WhenAction extends Stage<WhenAction> {
             while (fields.hasNext()) {
                 Map.Entry<String, JsonNode> entry = fields.next();
                 String key = entry.getKey();
-                // Only compare if the key exists in both nodes - removed fields from being compared based on v2_1_0 bugs in ARS
+                // Only compare if the key exists in both nodes - removed fields from being compared based on v2_1_0 bugs in ars
                 if (asset.has(key) && key != "date_metadata_updated" && key != "updateUser") {
                     JsonNode value1 = entry.getValue();
                     JsonNode value2 = asset.get(key);

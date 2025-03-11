@@ -185,7 +185,8 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
 
         logger.info("Trying to unlock an asset from the update");
         given().dassco_asset_service_server_is_up();
-        when().a_PUT_request_is_sent_to_fail_the_update_an_asset("test-suite-asset-updated", "test-suite-institution", "test-suite-workstation", "test-suite-pipeline", "test-suite-collection", "WORKING_COPY", "test-suite", false);
+        when().a_PUT_request_is_sent_to_fail_the_update_an_asset("test-suite-asset-updated", "test-suite-institution", "test-suite-workstation", 
+                                                                "test-suite-pipeline", "test-suite-collection", "WORKING_COPY", "test-suite", false);
         then().response_is_403(when().getStatusCode());
 
     }
@@ -336,7 +337,7 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
         then().response_is_200(when().getStatusCode());
 
         given().dassco_asset_service_server_is_up();
-        when().a_PUT_request_is_sent_to_manually_edit_an_assets_status("test-suite-asset-status", "ERDA_FAILED", "Error");
+        when().a_PUT_request_is_sent_to_manually_edit_an_assets_status("test-suite-asset-status", "ERDA_ERROR", "Error");
         then().response_is_204(when().getStatusCode());
     }
 
