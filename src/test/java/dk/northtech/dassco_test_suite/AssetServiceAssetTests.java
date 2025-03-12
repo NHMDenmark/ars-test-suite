@@ -1,12 +1,13 @@
 package dk.northtech.dassco_test_suite;
 
-import dk.northtech.dassco_test_suite.states.GivenState;
-import dk.northtech.dassco_test_suite.states.ThenOutcome;
-import dk.northtech.dassco_test_suite.states.WhenAction;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+
+import dk.northtech.dassco_test_suite.states.GivenState;
+import dk.northtech.dassco_test_suite.states.ThenOutcome;
+import dk.northtech.dassco_test_suite.states.WhenAction;
 
 //@SpringBootTest
 public class AssetServiceAssetTests extends BaseTest<GivenState, WhenAction, ThenOutcome> {
@@ -16,6 +17,8 @@ public class AssetServiceAssetTests extends BaseTest<GivenState, WhenAction, The
     @Value("${test-asset}")
     private String mainAsset;
 
+    /*
+    // This test is trying to reach an endpoint that doesnt exist
     @Test
     public void get_assets(){
         logger.info("Getting assets");
@@ -23,7 +26,7 @@ public class AssetServiceAssetTests extends BaseTest<GivenState, WhenAction, The
         when().a_GET_request_is_sent_to_get_assets();
         then().response_is_200(when().getStatusCode());
     }
-
+     */
     @Test
     public void failed_get_asset_status(){
         logger.info("Getting asset status for empty asset to trigger a 404 response");

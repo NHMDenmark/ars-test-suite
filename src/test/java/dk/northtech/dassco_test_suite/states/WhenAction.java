@@ -389,7 +389,7 @@ public class WhenAction extends Stage<WhenAction> {
 
         // Minimum information for updating is: institution, workstation, pipeline, collection, status and update user.
         // Then the Update field. We are testing if "funding" changes value (original = null, updated = "50000 kroner")
-        String body = "{\"asset_guid\":\"test-suite-asset_updated\", \"institution\":\"test-suite-institution\", \"workstation\":\"test-suite-workstation\", \"pipeline\":\"test-suite-pipeline\", \"collection\":\"test-suite-collection\", \"status\":\"WORKING_COPY\", \"updateUser\":\"test-suite\", \"funding\":\"50000 kroner\", \"asset_locked\": true }";
+        String body = "{\"asset_guid\":\"test-suite-asset-updated\", \"institution\":\"test-suite-institution\", \"workstation\":\"test-suite-workstation\", \"pipeline\":\"test-suite-pipeline\", \"collection\":\"test-suite-collection\", \"status\":\"WORKING_COPY\", \"updateUser\":\"test-suite\", \"funding\":\"50000 kroner\", \"asset_locked\": true }";
 
         getToken();
 
