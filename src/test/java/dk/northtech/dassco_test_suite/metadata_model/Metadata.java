@@ -60,14 +60,13 @@ public class Metadata{
     private Map<String, String> tags = new HashMap<>();
     private String workstation;
 }
-
-/* 
+/*
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class Metadata{
-    // from metadata version 3.0.0
+    // from metadata version 3.0.1
     private String asset_created_by;
     private String asset_deleted_by;
     private String asset_guid;
@@ -101,7 +100,7 @@ public class Metadata{
     private ArrayList<String> funding = new ArrayList<>();
     private String institution;
     @Builder.Default
-    private ArrayList<String> issues = new ArrayList<>();
+    private ArrayList<IssueModel> issues = new ArrayList<>();
     private boolean make_public;
     private String metadata_created_by;
     private String metadata_source;
@@ -109,6 +108,8 @@ public class Metadata{
     private String metadata_version;
     private String mos_id;
     private boolean multi_specimen;
+    @Builder.Default
+    private LegalityModel legality = new LegalityModel();
     private String parent_guid;
     private String payload_type;
     private String pipeline_name;
@@ -124,4 +125,5 @@ public class Metadata{
     private Map<String, String> tags = new HashMap<>();
     private String workstation_name;
 }
-*/
+ */
+
