@@ -27,7 +27,7 @@
     "funding":["Ådsels griffen", "Æsel kaninen", "Green Panther"],
     "institution":"test-suite-institution",
     "issues":[],
-    "legality":[],
+    "legality":{"copyright":null, "license":null, "credit":null},
     "make_public":true,
     "metadata_created_by":"",
     "metadata_source":"Suite-that-tests_v10",
