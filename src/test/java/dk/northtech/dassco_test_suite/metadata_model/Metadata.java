@@ -66,7 +66,7 @@ public class Metadata{
 @NoArgsConstructor
 @Builder
 public class Metadata{
-    // from metadata version 3.0.1
+    // from metadata version 3.0.2
     private String asset_created_by;
     private String asset_deleted_by;
     private String asset_guid;
@@ -110,7 +110,8 @@ public class Metadata{
     private boolean multi_specimen;
     @Builder.Default
     private LegalityModel legality = new LegalityModel();
-    private String parent_guid;
+    @Builder.Default
+    private ArrayList<String> parent_guid = new ArrayList<>();
     private String payload_type;
     private String pipeline_name;
     private String preparation_type;

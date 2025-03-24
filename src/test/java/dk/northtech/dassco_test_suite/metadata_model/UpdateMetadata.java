@@ -14,7 +14,8 @@ import java.util.HashMap;
 @NoArgsConstructor
 @Builder
 public class UpdateMetadata{
-    // update model - its identical to normal metadata except for the update_user field - might not be necessary for version 3.0.0
+    // metadata version 2_0_1
+    // update model - its identical to normal metadata except for the update_user field - might not be necessary for version 3.0.2
     private String updateUser;
     private String asset_created_by;
     private String asset_deleted_by;
@@ -68,7 +69,7 @@ public class UpdateMetadata{
 @NoArgsConstructor
 @Builder
 public class UpdateMetadata{
-    // from metadata version 3.0.0
+    // from metadata version 3.0.2
     private String asset_created_by;
     private String asset_deleted_by;
     private String asset_guid;
@@ -110,7 +111,8 @@ public class UpdateMetadata{
     private String metadata_version;
     private String mos_id;
     private boolean multi_specimen;
-    private String parent_guid;
+    @Builder.Default
+    private ArrayList<String> parent_guid = new ArrayList<>();
     private String payload_type;
     private String pipeline_name;
     private String preparation_type;
