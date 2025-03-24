@@ -41,7 +41,6 @@
     "preparation_type":"computed",
     "push_to_specify":false,
     "restricted_access":[],
-    "session_id":null,
     "specimen_pid":"",
     "status":"WORKING_COPY",
     "tags":{"parent": "im a child"},

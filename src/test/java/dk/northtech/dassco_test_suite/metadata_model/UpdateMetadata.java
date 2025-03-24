@@ -119,7 +119,6 @@ public class UpdateMetadata{
     private boolean push_to_specify;
     @Builder.Default
     private ArrayList<String> restricted_access = new ArrayList<>();
-    private String session_id;
     private String specimen_pid;
     @Builder.Default
     private String status = "WORKING_COPY";
