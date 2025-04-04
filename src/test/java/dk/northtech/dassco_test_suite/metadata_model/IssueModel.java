@@ -9,12 +9,18 @@ import lombok.Builder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class IssueModel{
-    private String name;
+public class IssueModel {
+    private String category;
+    @Builder.Default
+    private String name = null;
     @Builder.Default
     private String timestamp = null;
-    private String description;
-    private String note;
+    @Builder.Default
+    private String status = null;
+    @Builder.Default
+    private String description = null;
+    @Builder.Default
+    private String note = null;
     @Builder.Default
     private boolean solved = false;
 }
