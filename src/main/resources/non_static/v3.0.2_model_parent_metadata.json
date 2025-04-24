@@ -35,7 +35,7 @@
     "metadata_version":"sanity_check_v1",
     "mos_id":"workstation-date-mos-7",
     "multi_specimen":true,
-    "parent_guid":[],
+    "parent_guids":[],
     "payload_type":"cartoon",
     "pipeline_name":"test-suite-pipeline",
     "preparation_type":"handwritten",

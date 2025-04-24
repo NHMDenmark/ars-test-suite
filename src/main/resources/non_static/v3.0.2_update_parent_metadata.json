@@ -35,7 +35,7 @@
     "metadata_version":"insanity_v1",
     "mos_id":"mos-07",
     "multi_specimen":true,
-    "parent_guid":[],
+    "parent_guids":[],
     "payload_type":"dvd",
     "pipeline_name":"test-suite-pipeline",
     "preparation_type":"fermented",

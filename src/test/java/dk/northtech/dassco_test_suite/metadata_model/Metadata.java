@@ -1,13 +1,13 @@
 package dk.northtech.dassco_test_suite.metadata_model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Builder;
-
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 
 @Data
 @AllArgsConstructor
@@ -124,7 +124,7 @@ public class Metadata {
  * private boolean multi_specimen;
  * 
  * @Builder.Default
- * private ArrayList<String> parent_guid = new ArrayList<>();
+ * private ArrayList<String> parent_guids = new ArrayList<>();
  * private String payload_type;
  * private String pipeline_name;
  * private String preparation_type;

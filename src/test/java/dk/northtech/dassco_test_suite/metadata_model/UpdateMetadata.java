@@ -104,6 +104,8 @@ public class UpdateMetadata{
     private String institution;
     @Builder.Default
     private ArrayList<String> issues = new ArrayList<>();
+    @Builder.Default
+    private LegalityModel legality = new LegalityModel();
     private boolean make_public;
     private String metadata_created_by;
     private String metadata_source;
@@ -112,7 +114,7 @@ public class UpdateMetadata{
     private String mos_id;
     private boolean multi_specimen;
     @Builder.Default
-    private ArrayList<String> parent_guid = new ArrayList<>();
+    private ArrayList<String> parent_guids = new ArrayList<>();
     private String payload_type;
     private String pipeline_name;
     private String preparation_type;
