@@ -41,6 +41,8 @@
     "preparation_type":"fermented",
     "push_to_specify":true,
     "restricted_access":[],
+    "specify_attachment_remarks": null,
+    "specify_attachment_title": null,
     "specimen_pid":"",
     "status":"ISSUE_WITH_MEDIA",
     "tags":{"parent": "never again"},

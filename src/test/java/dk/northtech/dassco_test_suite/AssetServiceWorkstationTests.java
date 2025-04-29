@@ -22,18 +22,19 @@ public class AssetServiceWorkstationTests extends BaseTest<GivenState, WhenActio
         then().response_is_200(when().getStatusCode());
     }
 
-    // UPDATE WORKSTATION:
-    // TODO: When bug is fixed in DASSCO, remove the comment-out:
-//    @Test
-//    public void update_workstation(){
-//        System.err.println("Updating workstation status");
-//        given().dassco_asset_service_server_is_up()
-//                .and().workstation_has_status();
-//        when().a_PUT_request_is_sent_to_update_a_workstation(false);
-//        then().workstation_status_changed()
-//                .and().workstation_is_set_as_IN_SERVICE_again()
-//                .and().response_is_204(when().getStatusCode());
-//    }
+    //UPDATE WORKSTATION:
+    /* TODO: When bug is fixed in DASSCO, remove the comment-out:
+    @Test
+    public void update_workstation(){
+        System.err.println("Updating workstation status");
+        given().dassco_asset_service_server_is_up()
+                .and().workstation_has_status();/
+        when().a_PUT_request_is_sent_to_update_a_workstation(false);
+        then().workstation_status_changed()
+                .and().workstation_is_set_as_IN_SERVICE_again()
+                .and().response_is_204(when().getStatusCode());
+    }
+    */
 
     @Test
     public void fail_to_list_workstations(){
