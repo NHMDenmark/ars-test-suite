@@ -1752,11 +1752,11 @@ public class WhenAction extends Stage<WhenAction> {
             if (i_role.isEmpty()){
                 newRequest.uri(URI.create(assetServiceUrl + "/v1/institutions"))
                         .header("Content-Type", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + i_name +"\", \"roleRestriction\": []}"));
+                        .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + i_name +"\", \"roleRestrictions\": []}"));
             } else {
                 newRequest.uri(URI.create(assetServiceUrl + "/v1/institutions"))
                         .header("Content-Type", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + i_name  +"\", \"roleRestriction\": [{\"name\": \"" + i_role + "\"}]}"));
+                        .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + i_name  +"\", \"roleRestrictions\": [{\"name\": \"" + i_role + "\"}]}"));
             }
         } else if (entityType.equals("workstation")){
             newRequest.uri(URI.create(assetServiceUrl + "/v1/institutions/" + i_name + "/workstations"))
@@ -1770,11 +1770,11 @@ public class WhenAction extends Stage<WhenAction> {
             if (c_role.isEmpty()){
                 newRequest.uri(URI.create(assetServiceUrl + "/v1/institutions/" + i_name + "/collections"))
                         .header("Content-Type", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + c_name + "\", \"institution\": \"" + i_name + "\", \"roleRestrictions\": []}"));
+                        .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + c_name + "\", \"institution\": \"" + i_name + "\", \"roleRestrictionss\": []}"));
             } else {
                 newRequest.uri(URI.create(assetServiceUrl + "/v1/institutions/" + i_name + "/collections"))
                         .header("Content-Type", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + c_name + "\", \"institution\": \"" + i_name + "\", \"roleRestrictions\": [{ \"name\": \"" + c_role + "\"}]}"));
+                        .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + c_name + "\", \"institution\": \"" + i_name + "\", \"roleRestrictionss\": [{ \"name\": \"" + c_role + "\"}]}"));
             }
         }
 
