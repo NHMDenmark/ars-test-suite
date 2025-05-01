@@ -41,7 +41,7 @@ public class UpdateMetadata{
     private String date_pushed_to_specify;
     private String digitiser;
     @Builder.Default
-    private ArrayList<String> external_publisher = new ArrayList<>();
+    private ArrayList<ExternalPublisherModel> external_publishers = new ArrayList<>();
     @Builder.Default
     private ArrayList<String> file_format = new ArrayList<>();
     @Builder.Default

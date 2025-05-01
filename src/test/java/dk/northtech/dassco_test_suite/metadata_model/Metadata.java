@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
  @NoArgsConstructor
  @Builder
  public class Metadata {
- // from metadata version 3.0.2
+ // for metadata version 3.0.2
     private String asset_created_by;
     private String asset_deleted_by;
     private String asset_guid;
@@ -44,7 +44,7 @@ import lombok.NoArgsConstructor;
     private String digitiser;
  
     @Builder.Default
-    private ArrayList<String> external_publisher = new ArrayList<>();
+    private ArrayList<ExternalPublisherModel> external_publishers = new ArrayList<>();
  
     @Builder.Default
     private ArrayList<String> file_format = new ArrayList<>();
