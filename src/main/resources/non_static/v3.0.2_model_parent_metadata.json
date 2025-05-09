@@ -38,7 +38,7 @@
     "parent_guids":[],
     "payload_type":"cartoon",
     "pipeline_name":"test-suite-pipeline",
-    "preparation_type":"handwritten",
+    "preparation_type":["handwritten"],
     "push_to_specify":false,
     "restricted_access":[],
     "specify_attachment_remarks": null,

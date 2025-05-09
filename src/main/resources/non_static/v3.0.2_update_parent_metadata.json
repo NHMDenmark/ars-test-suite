@@ -38,7 +38,7 @@
     "parent_guids":[],
     "payload_type":"dvd",
     "pipeline_name":"test-suite-pipeline",
-    "preparation_type":"fermented",
+    "preparation_type":["fermented"],
     "push_to_specify":true,
     "restricted_access":[],
     "specify_attachment_remarks": null,

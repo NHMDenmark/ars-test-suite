@@ -70,7 +70,7 @@ import lombok.NoArgsConstructor;
     private ArrayList<String> parent_guids = new ArrayList<>();
     private String payload_type;
     private String pipeline_name;
-    private String preparation_type;
+    private ArrayList<String> preparation_type;
     private boolean push_to_specify;
  
     @Builder.Default

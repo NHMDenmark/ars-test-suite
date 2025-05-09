@@ -38,7 +38,7 @@
     "parent_guids":["test-suite-parent-asset"],
     "payload_type":"cartoon",
     "pipeline_name":"test-suite-pipeline",
-    "preparation_type":"computed",
+    "preparation_type":["computed"],
     "push_to_specify":false,
     "restricted_access":[],
     "specify_attachment_remarks":null,
