@@ -447,7 +447,7 @@ public class WhenAction extends Stage<WhenAction> {
                 .header("Authorization", "Bearer " + token)
                 .DELETE()
                 .build();
-
+        
         makeApiCall(request);
 
         return self();
@@ -1767,14 +1767,16 @@ public class WhenAction extends Stage<WhenAction> {
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + p_name + "\", \"institution\": \"" + i_name + "\"}"));
         } else if (entityType.equals("collection")) {
+            
             if (c_role.isEmpty()){
                 newRequest.uri(URI.create(assetServiceUrl + "/v1/institutions/" + i_name + "/collections"))
                         .header("Content-Type", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + c_name + "\", \"institution\": \"" + i_name + "\", \"roleRestrictionss\": []}"));
+                        .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + c_name + "\", \"institution\": \"" + i_name + "\", \"roleRestrictions\": []}"));
+                        System.out.print("{\"name\":\"" + c_name + "\", \"institution\": \"" + i_name + "\", \"roleRestrictions\": []}");
             } else {
                 newRequest.uri(URI.create(assetServiceUrl + "/v1/institutions/" + i_name + "/collections"))
                         .header("Content-Type", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + c_name + "\", \"institution\": \"" + i_name + "\", \"roleRestrictionss\": [{ \"name\": \"" + c_role + "\"}]}"));
+                        .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + c_name + "\", \"institution\": \"" + i_name + "\", \"roleRestrictions\": [{ \"name\": \"" + c_role + "\"}]}"));
             }
         }
 
