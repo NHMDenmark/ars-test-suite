@@ -23,8 +23,6 @@ public class UpdateMetadata{
     private String asset_updated_by;
     private boolean audited;
     private String audited_by;
-    @Builder.Default
-    private ArrayList<String> barcode = new ArrayList<>();
     private String camera_setting_control;
     private String collection;
     @Builder.Default
@@ -43,7 +41,7 @@ public class UpdateMetadata{
     @Builder.Default
     private ArrayList<ExternalPublisherModel> external_publishers = new ArrayList<>();
     @Builder.Default
-    private ArrayList<String> file_format = new ArrayList<>();
+    private ArrayList<String> file_formats = new ArrayList<>();
     @Builder.Default
     private ArrayList<String> funding = new ArrayList<>();
     private String institution;
@@ -61,17 +59,18 @@ public class UpdateMetadata{
     @Builder.Default
     private ArrayList<String> parent_guids = new ArrayList<>();
     private String payload_type;
-    private String pipeline_name;
+    private String pipeline;
     private ArrayList<String> preparation_type;
     private boolean push_to_specify;
     @Builder.Default
     private ArrayList<String> restricted_access = new ArrayList<>();
     private String specify_attachment_remarks;
     private String specify_attachment_title;
-    private String specimen_pid;
+    @Builder.Default
+    private ArrayList<SpecimenModel> specimens = new ArrayList<>();
     @Builder.Default
     private String status = "WORKING_COPY";
     @Builder.Default
     private Map<String, String> tags = new HashMap<>();
-    private String workstation_name;
+    private String workstation;
 }

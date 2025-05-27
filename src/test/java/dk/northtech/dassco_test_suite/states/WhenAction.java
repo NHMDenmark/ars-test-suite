@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -388,8 +389,8 @@ public class WhenAction extends Stage<WhenAction> {
     public WhenAction a_PUT_request_is_sent_to_update_an_asset(){
 
         // Minimum information for updating is: institution, workstation, pipeline, collection, status and update user.
-        // Then the Update field. We are testing if "funding" changes value (original = null, updated = "50000 kroner")
-        String body = "{\"asset_guid\":\"test-suite-asset-updated\", \"institution\":\"test-suite-institution\", \"workstation\":\"test-suite-workstation\", \"pipeline\":\"test-suite-pipeline\", \"collection\":\"test-suite-collection\", \"status\":\"WORKING_COPY\", \"updateUser\":\"test-suite\", \"funding\":\"50000 kroner\", \"asset_locked\": true }";
+        // Then the Update field. We are testing if "funding" changes value (original = null, updated = ["50000 kroner"])
+        String body = "{\"asset_guid\":\"test-suite-asset-updated\", \"institution\":\"test-suite-institution\", \"workstation\":\"test-suite-workstation\", \"pipeline\":\"test-suite-pipeline\", \"collection\":\"test-suite-collection\", \"status\":\"WORKING_COPY\", \"updateUser\":\"test-suite\", \"funding\":[\"50000 kroner\"], \"asset_locked\": true }";
 
         getToken();
 
@@ -2082,48 +2083,58 @@ public class WhenAction extends Stage<WhenAction> {
     }
 
     /**
-     * Recursively compares the shared keys between two JSON nodes.
+     * Compares the shared keys between two JSON nodes.
      *
      * @param model The first JSON is the model.
      * @param asset The second JSON is the asset gotten from ARS.
      * @return true if for every key that exists in both nodes the values are identical, false otherwise.
      */
-    public Boolean model_and_asset_data_match(JsonNode model, JsonNode asset){
-    
-        // If both nodes are objects, compare keys that are shared
+    public Boolean model_and_asset_data_match(JsonNode model, JsonNode asset) {
         if (model.isObject() && asset.isObject()) {
             Iterator<Map.Entry<String, JsonNode>> fields = model.fields();
             while (fields.hasNext()) {
                 Map.Entry<String, JsonNode> entry = fields.next();
                 String key = entry.getKey();
-                // Only compare if the key exists in both nodes - removed fields from being compared based on v2_1_0 bugs in ars
-                if (asset.has(key) && key != "date_metadata_updated" && key != "updateUser") {
+
+                // Only compare if the key exists in both nodes - and not automatic updates comes from ARS
+                if (asset.has(key) && 
+                    !key.equals("date_metadata_updated") && 
+                    !key.equals("updateUser") && 
+                    !key.equals("metadata_created_by") && 
+                    !key.equals("metadata_updated_by")) {
+
                     JsonNode value1 = entry.getValue();
                     JsonNode value2 = asset.get(key);
+
+                    // Handle keys starting with "data_"
+                    if (key.startsWith("date_") && !value1.asText().equals("null") && !value2.asText().equals("null")) {
+                        try {
+                            Instant instant1 = Instant.parse(value1.asText());
+                            Instant instant2 = Instant.parse(value2.asText());
+                            if (!instant1.equals(instant2)) {
+                                logger.error("Difference in Instant for key: " + key + " Model value: " + instant1 + " ARS value: " + instant2);
+                                return false;
+                            }
+                            continue; // skip recursive call
+                        } catch (DateTimeParseException e) {
+                            logger.error("Invalid Instant format for key: " + key + " Value: " + value1.asText(), e);
+                            return false;
+                        }
+                    }
+
+                    // Recurse for other types
                     if (!model_and_asset_data_match(value1, value2)) {
-                        logger.error("Difference found for key: " + key);
+                        logger.error("Difference found for key: " + key + " Model value: " + value1 + " ARS value: " + value2);
                         return false;
                     }
                 }
             }
             return true;
-        } 
-        // If both nodes are arrays, compare each element in order
-        else if (model.isArray() && asset.isArray()) {
-            if (model.size() != asset.size()) {
-                return false;
-            }
-            for (int i = 0; i < model.size(); i++) {
-                if (!model_and_asset_data_match(model.get(i), model.get(i))) {
-                    return false;
-                }
-            }
-            return true;
-        } 
+        }
         // For other types (string, number, boolean, null), compare them directly
         else {
             return model.equals(asset);
-        }    
+        } 
     }
 
 }

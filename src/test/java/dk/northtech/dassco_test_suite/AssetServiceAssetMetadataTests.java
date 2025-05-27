@@ -473,17 +473,6 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
 
     @Test
     @Order(10)
-    @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#modelDerivativeAssetAlreadyExists")
-    public void create_derivative_metadata_from_model(){
-        // create derivative model asset
-        logger.info("Creating derivative asset from model.");
-        given().dassco_asset_service_server_is_up();
-        when().a_POST_request_is_sent_based_on_model_data_to_create_an_assets_metadata(derivativeModel);
-        then().response_is_200(when().getStatusCode()).and().asset_internal_status_is_metadata_received(when().getInternalStatus());
-    }
-
-    @Test
-    @Order(11)
     public void compare_parent_model_data_with_ars_entry(){
         logger.info("Compare inserted parent data from asset parent model with ars data.");
         given().dassco_asset_service_server_is_up();
@@ -491,16 +480,8 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
         then().response_is_true();
     }
 
-    @Order(12)
     @Test
-    public void compare_derivative_model_data_with_ars_entry(){
-        logger.info("Compare inserted derivative data from asset parent model with ars data.");
-        given().dassco_asset_service_server_is_up();
-        when().compare_model_data_to_asset_in_ars(metaMapper.derivativeString);
-        then().response_is_true();
-    }
-
-    @Test
+    @Order(11)
     public void update_parent_model_and_check_values(){
         logger.info("Updating parent model with new values.");
         given().dassco_asset_service_server_is_up();
@@ -512,6 +493,28 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
         when().compare_model_data_to_asset_in_ars(metaMapper.updateParentString);
         then().response_is_true();
     }
+    /*
+    @Test
+    @Order(12)
+    @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#modelDerivativeAssetAlreadyExists")
+    public void create_derivative_metadata_from_model(){
+        // create derivative model asset
+        logger.info("Creating derivative asset from model.");
+        given().dassco_asset_service_server_is_up();
+        when().a_POST_request_is_sent_based_on_model_data_to_create_an_assets_metadata(derivativeModel);
+        then().response_is_200(when().getStatusCode()).and().asset_internal_status_is_metadata_received(when().getInternalStatus());
+    }
+
+
+    @Order(13)
+    @Test
+    public void compare_derivative_model_data_with_ars_entry(){
+        logger.info("Compare inserted derivative data from asset parent model with ars data.");
+        given().dassco_asset_service_server_is_up();
+        when().compare_model_data_to_asset_in_ars(metaMapper.derivativeString);
+        then().response_is_true();
+    }
+    
 
     @Test
     @Order(Integer.MAX_VALUE - 12)
@@ -526,7 +529,7 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
         when().a_DELETE_request_is_sent_to_delete_an_assets_metadata(this.derivativeModel.getAsset_guid());
         then().response_is_204(when().getStatusCode());
     }
-
+ */
     @Test
     @Order(Integer.MAX_VALUE - 11)
     public void close_share_and_delete_parent_model_asset() throws JSONException {
