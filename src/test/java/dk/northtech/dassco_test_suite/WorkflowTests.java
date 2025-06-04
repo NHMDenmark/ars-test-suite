@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 @SpringBootTest
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 @Order(1)
@@ -27,7 +29,7 @@ public class WorkflowTests extends BaseTest<GivenState, WhenAction, ThenOutcome>
 	@Test
 	@Order(0)
 	@DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#assetAlreadyExists")
-	public void asset_complete() throws JSONException {
+	public void asset_complete() throws JSONException, JsonProcessingException {
 		logger.info("Workflow #1");
 		logger.info("Creating asset");
 		// Create Asset:

@@ -825,7 +825,6 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    // TODO: This endpoint used to work, but now it's not.
     public WhenAction a_GET_request_is_sent_to_get_an_assets_status(String asset_guid){
 
         getToken();
@@ -1493,14 +1492,14 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_open_a_share() throws JSONException {
+    public WhenAction a_POST_request_is_sent_to_open_a_share(String asset_guid) throws JSONException {
 
-        String body = "{ \"assets\": [ { \"asset_guid\": \"" + mainAsset + "\", \"institution\": \"test-suite-institution\", \"collection\": \"test-suite-collection\" } ], \"users\": [ \"service-account-test-suite-service-user\" ], \"allocation_mb\": 10 }";
+        String body = "{ \"assets\": [ { \"asset_guid\": \"" + asset_guid + "\", \"institution\": \"test-suite-institution\", \"collection\": \"test-suite-collection\" } ], \"users\": [ \"service-account-test-suite-service-user\" ], \"allocation_mb\": 10 }";
 
         getToken();
 
         request = HttpRequest.newBuilder()
-                .uri(URI.create(fileProxyUrl + "/shares/assets/"+ mainAsset +"/createShare"))
+                .uri(URI.create(fileProxyUrl + "/shares/assets/"+ asset_guid +"/createShare"))
                 .header("Authorization", "Bearer " + token)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(body))
@@ -1709,19 +1708,24 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction waiting_for_erda_to_synchronize(String assetGuid) throws JSONException {
+    public WhenAction waiting_for_erda_to_synchronize(String assetGuid) throws JSONException, JsonProcessingException {
 
         getToken();
 
         Duration timeout = Duration.ofMinutes(2);
         Instant startTime = Instant.now();
+        ObjectMapper OM = new ObjectMapper();
 
         while(true){
             // Check:
+            a_GET_request_is_sent_to_get_an_assets_status(assetGuid);
 
-            a_GET_request_is_sent_to_get_list_of_asset_files(assetGuid);
+            String responseBody = response.body();
 
-            if (getResponseArray()){
+            JsonNode rootNode = OM.readTree(responseBody);
+            String status = rootNode.get("status").asText();
+
+            if (!status.matches("COMPLETED")){
                 logger.info("Erda hasn't synchronized yet. Trying again...");
             } else {
                 logger.info("Erda has synchronized.");
@@ -2003,6 +2007,8 @@ public class WhenAction extends Stage<WhenAction> {
             String ars_asset = get_asset_metadata(assetGuid);
             
             JsonNode asset_data = convert_json_to_node(ars_asset);
+
+            logger.info("ARS model: " +  ars_asset + "\nStatic Model: " + model);
             
             this.compareResult =  model_and_asset_data_match(model_data, asset_data);
             

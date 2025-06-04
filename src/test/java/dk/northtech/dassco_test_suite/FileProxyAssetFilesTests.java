@@ -24,7 +24,7 @@ public class FileProxyAssetFilesTests extends BaseTest<GivenState, WhenAction, T
 
     @Test
     @Order(0)
-    public void create_zip_csv_asset() throws JSONException {
+    public void create_zip_csv_asset() throws JSONException, JsonProcessingException {
         logger.info("Creating asset for creating .csv and .zip files");
         given().dassco_asset_service_server_is_up();
         when().a_POST_request_is_sent_to_create_an_assets_metadata("test-suite-asset-zip-csv-file", false);

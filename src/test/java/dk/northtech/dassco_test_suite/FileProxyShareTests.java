@@ -27,7 +27,7 @@ public class FileProxyShareTests extends BaseTest<GivenState, WhenAction, ThenOu
     public void open_share() throws JSONException, InterruptedException {
         logger.info("Opening share");
         given().dassco_file_proxy_server_is_up();
-        when().a_POST_request_is_sent_to_open_a_share();
+        when().a_POST_request_is_sent_to_open_a_share(mainAsset);
         then().response_is_200(when().getStatusCode())
                 .and().http_allocation_status_returns_success(when().getShareHttpAllocationStatus());
     }

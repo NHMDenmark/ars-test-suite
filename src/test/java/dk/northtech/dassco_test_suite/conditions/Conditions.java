@@ -429,6 +429,31 @@ public class Conditions {
         return true;
     }
 
+    static boolean modelParentAssetNotExists(){
+
+        getToken();
+
+        // Use Token to get asset:
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/" + parentGuid))
+                .header("Authorization", "Bearer " + token)
+                .GET()
+                .build();
+
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 204){
+                return true;
+            } else if(response.statusCode() == 200){
+                return false;
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return true;
+    }
+
     static boolean modelDerivativeAssetAlreadyExists(){
 
         getToken();
@@ -445,6 +470,31 @@ public class Conditions {
             if (response.statusCode() == 200){
                 return true;
             } else if(response.statusCode() == 204){
+                return false;
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return true;
+    }
+
+    static boolean modelDerivativeAssetNotExists(){
+
+        getToken();
+
+        // Use Token to get asset:
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/" + derivativeGuid))
+                .header("Authorization", "Bearer " + token)
+                .GET()
+                .build();
+
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 204){
+                return true;
+            } else if(response.statusCode() == 200){
                 return false;
             }
         } catch (Exception e){

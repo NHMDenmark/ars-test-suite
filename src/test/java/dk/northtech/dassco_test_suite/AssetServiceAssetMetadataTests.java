@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import dk.northtech.dassco_test_suite.metadata_model.Metadata;
 import dk.northtech.dassco_test_suite.metadata_model.MetadataMapper;
 import dk.northtech.dassco_test_suite.metadata_model.UpdateMetadata;
@@ -463,16 +465,26 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
     @Test
     @Order(9)
     @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#modelParentAssetAlreadyExists")
-    public void create_parent_metadata_from_model(){
-        // create parent model asset
+    public void create_parent_metadata_from_model() throws JSONException, JsonProcessingException{
+        String parent_asset_guid = this.parentModel.getAsset_guid();
+        // create parent model asset, including uploading file and syncing with erda.
         logger.info("Creating parent asset from model.");
         given().dassco_asset_service_server_is_up();
         when().a_POST_request_is_sent_based_on_model_data_to_create_an_assets_metadata(parentModel);
         then().response_is_200(when().getStatusCode()).and().asset_internal_status_is_metadata_received(when().getInternalStatus());
+        logger.info("Adding file and syncing with ERDA for parent asset.");
+        given().dassco_file_proxy_server_is_up();
+        when().a_PUT_request_is_sent_to_upload_a_file("cat.png", "129932955", parent_asset_guid, 1);
+        then().response_is_200(when().getStatusCode());
+        when().a_POST_request_is_sent_to_synchronize_with_erda(parent_asset_guid);
+        then().response_is_204(when().getStatusCode());
+        when().waiting_for_erda_to_synchronize(parent_asset_guid);
+        then().asset_status_is_completed(when().a_GET_request_is_sent_to_get_an_asset(parent_asset_guid). getInternalStatus());        
     }
 
     @Test
     @Order(10)
+    @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#modelParentAssetNotExists")
     public void compare_parent_model_data_with_ars_entry(){
         logger.info("Compare inserted parent data from asset parent model with ars data.");
         given().dassco_asset_service_server_is_up();
@@ -482,6 +494,7 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
 
     @Test
     @Order(11)
+    @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#modelParentAssetNotExists")
     public void update_parent_model_and_check_values(){
         logger.info("Updating parent model with new values.");
         given().dassco_asset_service_server_is_up();
@@ -493,7 +506,7 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
         when().compare_model_data_to_asset_in_ars(metaMapper.updateParentString);
         then().response_is_true();
     }
-    /*
+    
     @Test
     @Order(12)
     @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#modelDerivativeAssetAlreadyExists")
@@ -504,10 +517,10 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
         when().a_POST_request_is_sent_based_on_model_data_to_create_an_assets_metadata(derivativeModel);
         then().response_is_200(when().getStatusCode()).and().asset_internal_status_is_metadata_received(when().getInternalStatus());
     }
-
-
-    @Order(13)
+    
     @Test
+    @Order(13)
+    @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#modelDerivativeAssetNotExists")
     public void compare_derivative_model_data_with_ars_entry(){
         logger.info("Compare inserted derivative data from asset parent model with ars data.");
         given().dassco_asset_service_server_is_up();
@@ -515,11 +528,12 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
         then().response_is_true();
     }
     
-
     @Test
-    @Order(Integer.MAX_VALUE - 12)
+    @Order(Integer.MAX_VALUE - 13)
+    @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#modelDerivativeAssetNotExists")
     public void close_share_and_delete_derivative_model_asset() throws JSONException {
         // delete share and metadata for derivative model asset
+        logger.info("Close share and delete derivative metadata.");
         given().dassco_file_proxy_server_is_up();
         when().a_DELETE_request_is_sent_to_delete_a_share(this.derivativeModel.getAsset_guid());
         then().response_is_200(when().getStatusCode())
@@ -529,16 +543,32 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
         when().a_DELETE_request_is_sent_to_delete_an_assets_metadata(this.derivativeModel.getAsset_guid());
         then().response_is_204(when().getStatusCode());
     }
- */
+    
     @Test
-    @Order(Integer.MAX_VALUE - 11)
-    public void close_share_and_delete_parent_model_asset() throws JSONException {
-        // delete share and metadata for parent model asset
+    @Order(Integer.MAX_VALUE - 12)
+    @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#modelParentAssetNotExists")
+    public void  reopen_share_delete_file_resync_parent_model_asset() throws JSONException, JsonProcessingException {
+        // reopens the share, deletes the file and resyncs with erda
+        logger.info("Reopen share, delete files, resync w. ERDA for parent asset.");
         given().dassco_file_proxy_server_is_up();
-        when().a_DELETE_request_is_sent_to_delete_a_share(this.parentModel.getAsset_guid());
+        when().a_POST_request_is_sent_to_open_a_share(this.parentModel.getAsset_guid());
         then().response_is_200(when().getStatusCode())
                 .and().http_allocation_status_returns_success(when().getShareHttpAllocationStatus());
+        when().a_DELETE_request_is_sent_to_delete_all_files_for_an_asset(this.parentModel.getAsset_guid());
+        then().response_is_204(when().getStatusCode());
+        when().a_POST_request_is_sent_to_synchronize_with_erda(this.parentModel.getAsset_guid());
+        then().response_is_204(when().getStatusCode());
+        when().waiting_for_erda_to_synchronize(this.parentModel.getAsset_guid());
+        then().asset_status_is_completed(when().a_GET_request_is_sent_to_get_an_asset(this.parentModel.getAsset_guid()). getInternalStatus());
 
+    }
+
+    @Test
+    @Order(Integer.MAX_VALUE - 11)
+    @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#modelParentAssetNotExists")
+    public void delete_parent_model_asset() throws JSONException {
+        // delete metadata for parent model asset
+        logger.info("Delete parent metadata.");
         given().dassco_asset_service_server_is_up();
         when().a_DELETE_request_is_sent_to_delete_an_assets_metadata(this.parentModel.getAsset_guid());
         then().response_is_204(when().getStatusCode());
