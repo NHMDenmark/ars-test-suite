@@ -11,11 +11,15 @@ public class DasscoTestSuiteApplication {
 	public static void main(String[] args) {
 		System.out.println("Hello DaSSCo Test Suite!");
 
+		String username = "username";
+		String password = "password";
+		int collection = 688130;
+
 		String baseUrl = "https://specify-test3.science.ku.dk";
 		SpecifyCredentials credentials = new SpecifyCredentials(
-				"specifybridge",
-				"Xf2mHFxDECW3cx48",
-				688130
+				username,
+				password,
+				collection
 		);
 
 		SpecifyClient specifyClient = new SpecifyClient(baseUrl, credentials);
