@@ -35,10 +35,16 @@ public abstract class BaseTest<GivenType extends GivenState, WhenType extends Wh
     String writeRole1ClientSecret;
     @Value("${test-asset}")
     private String mainAsset;
+    @Value("${specify.url}")
+    String specifyUrl;
+    @Value("${specify.id}")
+    String specifyId;
+    @Value("${specify.secret}")
+    String specifySecret;
 
     @BeforeEach
     protected void setupScenario(){
-        given().setup(fileProxyUrl, assetServiceUrl, assetServiceHealth, keycloakHostname, clientId, clientSecret,
-                readRole1ClientId, readRole1ClientSecret, writeRole1ClientId, writeRole1ClientSecret, mainAsset, false);
+        given().setup(fileProxyUrl, assetServiceUrl, assetServiceHealth, keycloakHostname, clientId, clientSecret, readRole1ClientId,
+         readRole1ClientSecret, writeRole1ClientId, writeRole1ClientSecret, mainAsset, specifyUrl, specifyId, specifySecret, false);
     }
 }

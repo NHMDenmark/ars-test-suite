@@ -28,6 +28,8 @@ import com.tngtech.jgiven.Stage;
 import com.tngtech.jgiven.annotation.ProvidedScenarioState;
 
 import dk.northtech.dassco_test_suite.metadata_model.Metadata;
+import dk.northtech.dassco_test_suite.specify.SpecifyCredentials;
+import dk.northtech.dassco_test_suite.specify.SpecifyClient;
 
 
 public class WhenAction extends Stage<WhenAction> {
@@ -70,10 +72,20 @@ public class WhenAction extends Stage<WhenAction> {
     private String writeRole1ClientId;
     @ProvidedScenarioState
     private String writeRole1ClientSecret;
+    @ProvidedScenarioState
+    private String specifyId;
+    @ProvidedScenarioState
+    private String specifySecret;
+    @ProvidedScenarioState
+    String specifyUrl;
 
     // Created state
     @ProvidedScenarioState
     private boolean compareResult;
+
+    // Specify credentials and client
+    private final SpecifyCredentials specifyCredentials = new SpecifyCredentials(this.specifyId, this.specifySecret, this.collectionId);
+    private final SpecifyClient specifyClient = new SpecifyClient(specifyUrl, specifyCredentials);
 
     // Objectmapper
     private static final ObjectMapper objectMapper = new ObjectMapper();

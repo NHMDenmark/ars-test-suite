@@ -1,4 +1,4 @@
-package specify;
+package dk.northtech.dassco_test_suite.specify;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -23,7 +23,7 @@ public class SpecifyClient {
     private String csrfToken;
     private final int collectionId;
 
-    public SpecifyClient(String baseUrl, SpecifyCredentials credentials) {
+    public SpecifyClient(SpecifyCredentials credentials) {
         this.cookieManager = new CookieManager();
         this.cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
         this.gson = new Gson();
@@ -32,8 +32,8 @@ public class SpecifyClient {
                 .cookieHandler(cookieManager)
                 .build();
 
-        this.baseUrl = baseUrl;
-        this.collectionId = credentials.collectionId();
+        this.baseUrl = credentials.getSpecifyUrl();
+        this.collectionId = credentials.getCollectionId();
         this.csrfToken = this.login(credentials);
     }
 
@@ -64,11 +64,16 @@ public class SpecifyClient {
     }
 
     private String login(SpecifyCredentials credentials) {
+
+        String specifyId = credentials.getSpecifyId();
+        String specifySecret = credentials.getSpecifySecret();
+        int collectionId = credentials.getCollectionId();
+
         String requestBody = String.format(
                 "{\"username\":\"%s\",\"password\":\"%s\",\"collection\":%d}",
-                credentials.username(),
-                credentials.password(),
-                credentials.collectionId()
+                specifyId,
+                specifySecret,
+                collectionId
         );
 
         HttpRequest req = baseRequestBuilder("/context/login/")
