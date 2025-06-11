@@ -84,8 +84,8 @@ public class WhenAction extends Stage<WhenAction> {
     private boolean compareResult;
 
     // Specify credentials and client
-    private final SpecifyCredentials specifyCredentials = new SpecifyCredentials(this.specifyId, this.specifySecret, this.collectionId);
-    private final SpecifyClient specifyClient = new SpecifyClient(specifyUrl, specifyCredentials);
+    private final SpecifyCredentials specifyCredentials = new SpecifyCredentials(2222);
+    private final SpecifyClient specifyClient = new SpecifyClient(specifyCredentials);
 
     // Objectmapper
     private static final ObjectMapper objectMapper = new ObjectMapper();
