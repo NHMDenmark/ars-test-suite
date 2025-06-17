@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@SpringBootTest(classes=dk.northtech.dassco_test_suite.configurations.Configurations.class)
 public class FileProxyAssetTests extends BaseTest<GivenState, WhenAction, ThenOutcome> {
 
     private static final Logger logger = LoggerFactory.getLogger(FileProxyAssetTests.class);

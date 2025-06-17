@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//@SpringBootTest
+//@SpringBootTest(classes=dk.northtech.dassco_test_suite.configurations.Configurations.class)
 public class AssetServiceCollectionTests extends BaseTest<GivenState, WhenAction, ThenOutcome> {
     // GET COLLECTION LIST:
 

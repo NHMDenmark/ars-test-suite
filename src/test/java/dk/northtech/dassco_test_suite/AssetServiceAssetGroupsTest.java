@@ -15,7 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.ArrayList;
 import java.util.List;
 
-@SpringBootTest
+@SpringBootTest(classes=dk.northtech.dassco_test_suite.configurations.Configurations.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AssetServiceAssetGroupsTest extends BaseTest<GivenState, WhenAction, ThenOutcome> {
 

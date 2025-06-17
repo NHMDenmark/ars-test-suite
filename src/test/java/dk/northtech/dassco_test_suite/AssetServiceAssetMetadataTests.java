@@ -23,7 +23,7 @@ import dk.northtech.dassco_test_suite.states.GivenState;
 import dk.northtech.dassco_test_suite.states.ThenOutcome;
 import dk.northtech.dassco_test_suite.states.WhenAction;
 
-@SpringBootTest
+@SpringBootTest(classes=dk.northtech.dassco_test_suite.configurations.Configurations.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAction, ThenOutcome> {
 
@@ -339,7 +339,7 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
         then().response_is_200(when().getStatusCode());
 
         given().dassco_asset_service_server_is_up();
-        when().a_PUT_request_is_sent_to_manually_edit_an_assets_status("test-suite-asset-status", "ERDA_ERROR", "Error");
+        when().a_PUT_request_is_sent_to_manually_edit_an_assets_status("test-suite-asset-status", "ERDA_FAILED", "Error");
         then().response_is_204(when().getStatusCode());
     }
 
@@ -479,7 +479,7 @@ public class AssetServiceAssetMetadataTests extends BaseTest<GivenState, WhenAct
         when().a_POST_request_is_sent_to_synchronize_with_erda(parent_asset_guid);
         then().response_is_204(when().getStatusCode());
         when().waiting_for_erda_to_synchronize(parent_asset_guid);
-        then().asset_status_is_completed(when().a_GET_request_is_sent_to_get_an_asset(parent_asset_guid). getInternalStatus());        
+        then().asset_status_is_erda_synchronised(when().a_GET_request_is_sent_to_get_an_asset(parent_asset_guid). getInternalStatus());        
     }
 
     @Test

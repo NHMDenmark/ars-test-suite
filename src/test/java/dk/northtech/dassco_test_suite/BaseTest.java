@@ -10,7 +10,7 @@ import dk.northtech.dassco_test_suite.states.GivenState;
 import dk.northtech.dassco_test_suite.states.ThenOutcome;
 import dk.northtech.dassco_test_suite.states.WhenAction;
 
-@SpringBootTest
+@SpringBootTest(classes=dk.northtech.dassco_test_suite.configurations.Configurations.class)
 public abstract class BaseTest<GivenType extends GivenState, WhenType extends WhenAction, ThenType extends ThenOutcome> extends ScenarioTest<GivenType, WhenType, ThenType> {
     // Environmental Variables are passed to GivenState which propagates it to WhenAction and ThenOutcome:
     @Value("${fileproxy.url}")
@@ -41,10 +41,12 @@ public abstract class BaseTest<GivenType extends GivenState, WhenType extends Wh
     String specifyId;
     @Value("${specify.secret}")
     String specifySecret;
+    @Value("${specify.collection.id}")
+    String specifyCollectionId;
 
     @BeforeEach
     protected void setupScenario(){
         given().setup(fileProxyUrl, assetServiceUrl, assetServiceHealth, keycloakHostname, clientId, clientSecret, readRole1ClientId,
-         readRole1ClientSecret, writeRole1ClientId, writeRole1ClientSecret, mainAsset, specifyUrl, specifyId, specifySecret, false);
+         readRole1ClientSecret, writeRole1ClientId, writeRole1ClientSecret, mainAsset, specifyUrl, specifyId, specifySecret, specifyCollectionId, false);
     }
 }

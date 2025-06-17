@@ -122,6 +122,31 @@ public class Conditions {
         return true;
     }
 
+    static boolean NHMDAlreadyExists(){
+
+        getToken();
+
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(assetServiceUrl + "/v1/institutions/NHMD"))
+                .header("Authorization", "Bearer " + token)
+                .GET()
+                .build();
+
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 204){
+                return false;
+            } else if (response.statusCode() == 200) {
+                return true;
+            }
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return true;
+    }
+
     // True if no workstation exists.
     static boolean noWorkstationExists(){
 
@@ -194,6 +219,63 @@ public class Conditions {
                 return true;
             }
 
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return true;
+    }
+
+    static boolean noWorkstationExistsNHMD(){
+
+        getToken();
+
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(assetServiceUrl + "/v1/institutions/NHMD/workstations"))
+                .header("Authorization", "Bearer " + token)
+                .GET()
+                .build();
+
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            JSONArray workstations = new JSONArray(response.body());
+            if (workstations.length() > 0){
+                return false;
+            } else {
+                return true;
+            }
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return true;
+    }
+
+    static boolean workstationAlreadyExistsWORKHERB0001(){
+
+        getToken();
+
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(assetServiceUrl + "/v1/institutions/NHMD/workstations"))
+                .header("Authorization", "Bearer " + token)
+                .GET()
+                .build();
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            JSONArray workstations = new JSONArray(response.body());
+            // System.out.println(workstations.toString());
+            if (workstations.length() > 0){
+                
+                for (int i = 0; i < workstations.length(); i++){
+                    if (workstations.getJSONObject(i).getString("name").equals("WORKHERB0001"));
+                        return true;
+                }
+            }
+            else {
+                return false;
+            }
+            
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -303,6 +385,36 @@ public class Conditions {
         return true;
     }
 
+    static boolean pipelineAlreadyExistsPIPEHERB0001(){
+
+        getToken();
+
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(assetServiceUrl + "/v1/institutions/NHMD/pipelines"))
+                .header("Authorization", "Bearer " + token)
+                .GET()
+                .build();
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            JSONArray workstations = new JSONArray(response.body());
+            if (workstations.length() > 0){
+                
+                for (int i = 0; i < workstations.length(); i++){
+                    if (workstations.getJSONObject(i).getString("name").equals("PIPEHERB0001"));
+                        return true;
+                }
+            }
+            else {
+                return false;
+            }
+            
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return true;
+    }
+
     // True if collection already exists.
     static boolean collectionAlreadyExists(){
 
@@ -372,6 +484,36 @@ public class Conditions {
             } else {
                 return false;
             }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return true;
+    }
+
+    static boolean collectionAlreadyExistsNHMD_Vascular_Plants(){
+
+        getToken();
+
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(assetServiceUrl + "/v1/institutions/NHMD/collections"))
+                .header("Authorization", "Bearer " + token)
+                .GET()
+                .build();
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            JSONArray workstations = new JSONArray(response.body());
+            if (workstations.length() > 0){
+                
+                for (int i = 0; i < workstations.length(); i++){
+                    if (workstations.getJSONObject(i).getString("name").equals("PIPEHERB0001"));
+                        return true;
+                }
+            }
+            else {
+                return false;
+            }
+            
         } catch (Exception e){
             e.printStackTrace();
         }

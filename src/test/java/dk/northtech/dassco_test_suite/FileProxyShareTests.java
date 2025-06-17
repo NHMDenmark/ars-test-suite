@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@SpringBootTest(classes=dk.northtech.dassco_test_suite.configurations.Configurations.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class FileProxyShareTests extends BaseTest<GivenState, WhenAction, ThenOutcome> {
 

@@ -57,6 +57,8 @@ public class GivenState extends Stage<GivenState> {
     private String specifySecret;
     @ProvidedScenarioState
     private String specifyUrl;
+    @ProvidedScenarioState
+    private String specifyCollectionId;
 
     // Created variable
     @ProvidedScenarioState
@@ -64,7 +66,7 @@ public class GivenState extends Stage<GivenState> {
 
     public GivenState setup(String fileProxyUrl, String assetServiceUrl, String assetServiceHealth, String keycloakHostname,
                             String clientId, String clientSecret, String readRole1ClientId, String readRole1ClientSecret,
-                            String writeRole1ClientId, String writeRole1ClientSecret, String mainAsset, String specifyUrl, String specifyId, String specifySeceret, Boolean compareResult){
+                            String writeRole1ClientId, String writeRole1ClientSecret, String mainAsset, String specifyUrl, String specifyId, String specifySeceret, String specifyCollectionId, Boolean compareResult){
         this.fileProxyUrl = fileProxyUrl;
         this.assetServiceUrl = assetServiceUrl;
         this.keycloakHostname = keycloakHostname;
@@ -80,6 +82,7 @@ public class GivenState extends Stage<GivenState> {
         this.specifyId = specifyId;
         this.specifySecret = specifySecret;
         this.specifyUrl = specifyUrl;
+        this.specifyCollectionId = specifyCollectionId;
         return self();
     }
 

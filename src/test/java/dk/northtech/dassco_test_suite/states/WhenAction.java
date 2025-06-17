@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.tngtech.jgiven.Stage;
 import com.tngtech.jgiven.annotation.ProvidedScenarioState;
 
@@ -73,19 +75,15 @@ public class WhenAction extends Stage<WhenAction> {
     @ProvidedScenarioState
     private String writeRole1ClientSecret;
     @ProvidedScenarioState
-    private String specifyId;
-    @ProvidedScenarioState
-    private String specifySecret;
-    @ProvidedScenarioState
-    String specifyUrl;
+    private int specifyCollectionId;
 
     // Created state
     @ProvidedScenarioState
     private boolean compareResult;
 
     // Specify credentials and client
-    private final SpecifyCredentials specifyCredentials = new SpecifyCredentials(2222);
-    private final SpecifyClient specifyClient = new SpecifyClient(specifyCredentials);
+    private final SpecifyCredentials specifyCredentials = new SpecifyCredentials(this.specifyCollectionId);
+    //private final SpecifyClient specifyClient = new SpecifyClient(specifyCredentials);
 
     // Objectmapper
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -1760,6 +1758,46 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
+    public WhenAction waiting_to_sync_with_specify(String assetGuid) throws JSONException, JsonProcessingException {
+
+        getToken();
+
+        Duration timeout = Duration.ofMinutes(3);
+        Instant startTime = Instant.now();
+        ObjectMapper OM = new ObjectMapper();
+
+        while(true){
+            // Check:
+            a_GET_request_is_sent_to_get_an_assets_status(assetGuid);
+
+            String responseBody = response.body();
+
+            JsonNode rootNode = OM.readTree(responseBody);
+            String status = rootNode.get("status").asText();
+
+            if (!status.matches("SPECIFY_SYNCHRONISED")){
+                logger.info("Specify hasn't synchronized yet. Trying again...");
+            } else {
+                logger.info("Specify has synchronized.");
+        
+                break;
+            }
+
+            Instant currentTime = Instant.now();
+            if(Duration.between(startTime, currentTime).compareTo(timeout) >= 0){
+                logger.error("Timeout. Not attempting to synchronize anymore.");
+                break;
+            }
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return self();
+    }
+
     // Helper functions:
     public HttpRequest postRequestBuilder(String entityType, String i_role, String c_role, String i_name, String c_name, String p_name, String w_name){
 
@@ -2108,8 +2146,10 @@ public class WhenAction extends Stage<WhenAction> {
      * @return true if for every key that exists in both nodes the values are identical, false otherwise.
      */
     public Boolean model_and_asset_data_match(JsonNode model, JsonNode asset) {
+        
         if (model.isObject() && asset.isObject()) {
             Iterator<Map.Entry<String, JsonNode>> fields = model.fields();
+            
             while (fields.hasNext()) {
                 Map.Entry<String, JsonNode> entry = fields.next();
                 String key = entry.getKey();
@@ -2124,7 +2164,7 @@ public class WhenAction extends Stage<WhenAction> {
                     JsonNode value1 = entry.getValue();
                     JsonNode value2 = asset.get(key);
 
-                    // Handle keys starting with "data_"
+                    // Handle keys starting with "date_"
                     if (key.startsWith("date_") && !value1.asText().equals("null") && !value2.asText().equals("null")) {
                         try {
                             Instant instant1 = Instant.parse(value1.asText());
@@ -2139,6 +2179,36 @@ public class WhenAction extends Stage<WhenAction> {
                             return false;
                         }
                     }
+                    
+                    // handle arrays containing same objects but in different order
+                    if (model.isArray() && asset.isArray()) {
+                        ArrayNode array1 = (ArrayNode) model;
+                        ArrayNode array2 = (ArrayNode) asset;
+
+                        if (array1.size() != array2.size()) return false;
+
+                        List<JsonNode> list1 = new ArrayList<>();
+                        List<JsonNode> list2 = new ArrayList<>();
+                        array1.forEach(list1::add);
+                        array2.forEach(list2::add);
+
+                        // Match elements from list1 with any in list2 (remove matched to avoid duplicates)
+                        for (JsonNode node1 : list1) {
+                            boolean matchFound = false;
+                            Iterator<JsonNode> it = list2.iterator();
+                            while (it.hasNext()) {
+                                JsonNode node2 = it.next();
+                                if (model_and_asset_data_match(node1, node2)) {
+                                    it.remove(); // remove match
+                                    matchFound = true;
+                                    break;
+                                }
+                            }
+                            if (!matchFound) {
+                                logger.error("No matching element found for array item: " + node1);
+                                return false;
+                            }
+                        }                        
 
                     // Recurse for other types
                     if (!model_and_asset_data_match(value1, value2)) {
@@ -2147,12 +2217,13 @@ public class WhenAction extends Stage<WhenAction> {
                     }
                 }
             }
+        }
             return true;
+            
         }
         // For other types (string, number, boolean, null), compare them directly
         else {
             return model.equals(asset);
-        } 
+            }        
     }
-
 }

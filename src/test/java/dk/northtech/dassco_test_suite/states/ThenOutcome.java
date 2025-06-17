@@ -185,6 +185,16 @@ public class ThenOutcome extends Stage<ThenOutcome> {
         return self();
     }
 
+    public ThenOutcome asset_status_is_erda_synchronised(String status){
+        assertEquals("ERDA_SYNCHRONISED", status);
+        return self();
+    }
+
+    public ThenOutcome asset_status_is_specify_synchronised(String status){
+        assertEquals("SPECIFY_SYNCHRONISED", status);
+        return self();
+    }
+
     public ThenOutcome response_is_true(){
         assertTrue(compareResult);
         return self();

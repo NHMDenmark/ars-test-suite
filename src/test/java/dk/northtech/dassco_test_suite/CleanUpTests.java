@@ -11,7 +11,7 @@ import org.junit.jupiter.api.TestClassOrder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@SpringBootTest(classes=dk.northtech.dassco_test_suite.configurations.Configurations.class)
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 @Order(Integer.MAX_VALUE)
 public class CleanUpTests extends BaseTest<GivenState, WhenAction, ThenOutcome> {

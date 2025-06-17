@@ -16,6 +16,8 @@ public class CredentialsBean {
     private String specifySecret;
     @Value("${specify.url}")
     private String specifyUrl;
+    @Value("${specify.collection.id}")
+    private String specifyCollectionId;
     
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
@@ -32,5 +34,10 @@ public class CredentialsBean {
     @Bean
     public String beanSpecifyUrl() {
         return this.specifyUrl;
+    }
+    
+    @Bean
+    public String beanSpecifyCollectionId(){
+        return this.specifyCollectionId;
     }
 }

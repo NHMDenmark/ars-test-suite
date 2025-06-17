@@ -5,8 +5,10 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.boot.SpringBootConfiguration;
 
-@Configuration
+@SpringBootConfiguration
+//@Configuration
 public class Configurations {
 
     // Configures the Environmental variables to be accessible in the Conditions class:

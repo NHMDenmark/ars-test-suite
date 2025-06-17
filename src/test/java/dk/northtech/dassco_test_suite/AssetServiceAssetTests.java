@@ -9,7 +9,7 @@ import dk.northtech.dassco_test_suite.states.GivenState;
 import dk.northtech.dassco_test_suite.states.ThenOutcome;
 import dk.northtech.dassco_test_suite.states.WhenAction;
 
-//@SpringBootTest
+//@SpringBootTest(classes=dk.northtech.dassco_test_suite.configurations.Configurations.class)
 public class AssetServiceAssetTests extends BaseTest<GivenState, WhenAction, ThenOutcome> {
 
     private static final Logger logger = LoggerFactory.getLogger(AssetServiceAssetTests.class);

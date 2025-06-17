@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-@SpringBootTest
+@SpringBootTest(classes=dk.northtech.dassco_test_suite.configurations.Configurations.class)
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 @Order(1)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

@@ -1,16 +1,22 @@
 package dk.northtech.dassco_test_suite;
 
-import dk.northtech.dassco_test_suite.states.GivenState;
-import dk.northtech.dassco_test_suite.states.ThenOutcome;
-import dk.northtech.dassco_test_suite.states.WhenAction;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.ClassOrderer;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestClassOrder;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.condition.DisabledIf;
 import org.junit.jupiter.api.condition.EnabledIf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+import dk.northtech.dassco_test_suite.states.GivenState;
+import dk.northtech.dassco_test_suite.states.ThenOutcome;
+import dk.northtech.dassco_test_suite.states.WhenAction;
+
+@SpringBootTest(classes=dk.northtech.dassco_test_suite.configurations.Configurations.class)
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 @Order(0)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -143,6 +149,45 @@ public class SetUpTests extends BaseTest<GivenState, WhenAction, ThenOutcome> {
         logger.info("Creating Collection");
         given().dassco_asset_service_server_is_up();
         when().a_POST_request_is_sent_to_create_an_institution_or_workstation_or_pipeline_or_collection("collection", "", "test-suite-role-2", "test-suite-institution-3", "test-suite-collection-3", null, null);
+        then().response_is_200(when().getStatusCode());
+    }
+
+    @Test
+    @Order(13)
+    @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#NHMDAlreadyExists")
+    public void create_NHMD_institution(){
+        given().dassco_asset_service_server_is_up();
+        when().a_POST_request_is_sent_to_create_an_institution_or_workstation_or_pipeline_or_collection("institution", "", "", "NHMD", null, null, null);
+        then().response_is_200(when().getStatusCode());
+    }
+
+    @Test
+    @Order(14)
+    @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#workstationAlreadyExistsWORKHERB0001")
+    public void create_NHMD_workstation(){
+        logger.info("Creating Workstation");
+        given().dassco_asset_service_server_is_up();
+        when().a_POST_request_is_sent_to_create_an_institution_or_workstation_or_pipeline_or_collection("workstation", "", "", "NHMD", "NHMD Vascular Plants", "PIPEHERB0001", "WORKHERB0001");
+        then().response_is_200(when().getStatusCode());
+    }
+
+    @Test
+    @Order(15)
+    @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#pipelineAlreadyExistsPIPEHERB0001")
+    public void create_NHMD_pipeline(){
+        logger.info("Creating Pipeline");
+        given().dassco_asset_service_server_is_up();
+        when().a_POST_request_is_sent_to_create_an_institution_or_workstation_or_pipeline_or_collection("pipeline", "", "", "NHMD", null, "PIPEHERB0001", null);
+        then().response_is_200(when().getStatusCode());
+    }
+
+    @Test
+    @Order(16)
+    @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#collectionAlreadyExistsNHMD_Vascular_Plants")
+    public void create_NHMD_collection(){
+        logger.info("Creating Collection");
+        given().dassco_asset_service_server_is_up();
+        when().a_POST_request_is_sent_to_create_an_institution_or_workstation_or_pipeline_or_collection("collection", "", "", "NHMD", "NHMD Vascular Plants", null, null);
         then().response_is_200(when().getStatusCode());
     }
 }

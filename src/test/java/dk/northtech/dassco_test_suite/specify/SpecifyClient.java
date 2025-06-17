@@ -4,6 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
+import static org.junit.Assert.assertNotEquals;
+
 import java.io.IOException;
 import java.net.*;
 import java.net.http.HttpClient;
@@ -21,7 +23,7 @@ public class SpecifyClient {
     private final Gson gson;
     private final String baseUrl;
     private String csrfToken;
-    private final int collectionId;
+    private final String collectionId;
 
     public SpecifyClient(SpecifyCredentials credentials) {
         this.cookieManager = new CookieManager();
@@ -33,7 +35,7 @@ public class SpecifyClient {
                 .build();
 
         this.baseUrl = credentials.getSpecifyUrl();
-        this.collectionId = credentials.getCollectionId();
+        this.collectionId = credentials.getSpecifyCollectionId();
         this.csrfToken = this.login(credentials);
     }
 
@@ -42,7 +44,7 @@ public class SpecifyClient {
                 .uri(URI.create(this.baseUrl + path))
                 .header("Content-Type", "application/json")
                 .header("Referer", this.baseUrl);
-
+        System.out.println(this.baseUrl + path);
         if (this.csrfToken != null) {
             builder.header("X-CSRFToken", this.csrfToken);
         }
@@ -67,10 +69,10 @@ public class SpecifyClient {
 
         String specifyId = credentials.getSpecifyId();
         String specifySecret = credentials.getSpecifySecret();
-        int collectionId = credentials.getCollectionId();
+        String collectionId = credentials.getSpecifyCollectionId();
 
         String requestBody = String.format(
-                "{\"username\":\"%s\",\"password\":\"%s\",\"collection\":%d}",
+                "{\"username\":\"%s\",\"password\":\"%s\",\"collection\":%s}",
                 specifyId,
                 specifySecret,
                 collectionId
@@ -118,20 +120,31 @@ public class SpecifyClient {
         sendRequest(req);
     }
 
-    public GetBuilder get(String objectName) {
-        return new GetBuilder(objectName);
+    public GetBuilder get(String objectName, String objectId) {
+        return new GetBuilder(objectName, objectId);
+    }
+
+    public DeleteAssetBuilder delete(String assetGuid){
+        return new DeleteAssetBuilder(assetGuid);
     }
 
 
     public class GetBuilder {
         private final String objectName;
+        private String objectId;
         private int limit = 100;
         private int offset = 0;
         private String sort = "";
         private final Map<String, String> filters = new LinkedHashMap<>();
 
-        public GetBuilder(String objectName) {
+        public GetBuilder(String objectName, String objectId) {
             this.objectName = objectName;
+            this.objectId = objectId;
+        }
+
+        public GetBuilder objectId(String objectId){
+            this.objectId = objectId;
+            return this;
         }
 
         public GetBuilder limit(int limit) {
@@ -171,8 +184,45 @@ public class SpecifyClient {
                         .append(URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8));
             }
 
-            HttpRequest req = baseRequestBuilder("/api/specify/" + objectName + "/?" + qs)
+            String urlExt = "/api/specify/" + objectName;
+            String body;
+            if (objectId != null){
+                urlExt = "/api/specify/" + objectName + "/?attachment=" + objectId;
+                System.out.println(urlExt);
+                HttpRequest req = baseRequestBuilder(urlExt)
                     .GET()
+                    .build();
+                body = sendRequest(req);               
+            }
+            else{
+                HttpRequest req = baseRequestBuilder(urlExt + "/?" + qs)
+                    .GET()
+                    .build();
+                body = sendRequest(req);
+            }
+            
+            JsonObject jsonObject = gson.fromJson(body, JsonObject.class);
+            JsonArray objects = jsonObject.getAsJsonArray("objects");
+            var listType = new TypeToken<Map<String,Object>>(){}.getType();
+            List<Map<String,Object>> result = new ArrayList<>();
+            for (var el : objects) {
+                result.add(gson.fromJson(el, listType));
+            }
+            return result;
+        }
+    }
+
+    public class DeleteAssetBuilder{
+        private String assetGuid;
+
+        public DeleteAssetBuilder(String assetGuid){
+            this.assetGuid = assetGuid;
+        }
+
+        public List<Map<String, Object>> execute(){
+
+            HttpRequest req = baseRequestBuilder("/api/specify/attachmentmetadata/" + assetGuid + "/")
+                    .DELETE()
                     .build();
 
             String body = sendRequest(req);

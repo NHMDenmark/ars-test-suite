@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@SpringBootTest(classes=dk.northtech.dassco_test_suite.configurations.Configurations.class)
 public class AssetServiceWorkstationTests extends BaseTest<GivenState, WhenAction, ThenOutcome> {
 
     private static final Logger logger = LoggerFactory.getLogger(AssetServiceWorkstationTests.class);

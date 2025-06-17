@@ -18,6 +18,8 @@ public class UpdateMetadata{
     private String asset_created_by;
     private String asset_deleted_by;
     private String asset_guid;
+    @Builder.Default
+    private Boolean asset_locked = false;
     private String asset_pid;
     private String asset_subject;
     private String asset_updated_by;
