@@ -35,13 +35,8 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
     private final Metadata specifyBridge = metaMapper.bridge;
     private final UpdateMetadata updateBridge = metaMapper.updateBridge;
 
-    // specimen id in specify - set for dummy specimen
-    private final int collection_object_id = 6105988;
-    // collection id in specify - set for "NHMD Vascular Plants"
-    private final int collection = 688130;
-
-	private final SpecifyCredentials credentials = new SpecifyCredentials(this.collection);
-	private final SpecifyClient specifyClient = new SpecifyClient(this.credentials);
+    // specimen id in specify - set for dummy specimen - if a new test specimen is created this needs to be updated here before running these tests
+    private final String collection_object_id = "6105988";
 
     @Test
     @Order(0)
@@ -66,6 +61,14 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
 
     @Test
     @Order(1)
+    public void check_specimen_is_in_specify() throws JSONException, JsonProcessingException {
+        logger.info("Checking specimen exist in specify.");
+        when().specimen_is_in_specify(this.collection_object_id);
+        then().response_is_true();
+    }
+
+    @Test
+    @Order(2)
     // @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#modelBridgeAssetNotExists") // TODO 
     public void update_specify_bridge_model_and_check_values() throws JSONException, JsonProcessingException{
         logger.info("Updating specify bridge model with new values.");
@@ -80,14 +83,17 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
     }
 
     @Test
-    @Order(2)
-    // #TODO add potential disable
-    public void get_bridge_metadata_from_specify() throws JSONException, JsonProcessingException {
-        logger.info("Getting bridge metadata from specify and comparing with model data.");
-        given().specimen_is_in_specify(this.collection_object_id);
+    @Order(3)
+    public void check_attachment_data_match() throws JSONException, JsonProcessingException {
+        logger.info("Checking data match for relevant fields between specify attachement and model data.");
+        when().get_and_compare_specify_data_with_model_data(this.collection_object_id);
+        then().response_is_true();
+    }
+        /*
         when().get_metadata_from_specify(this.collection_object_id, "guid");
         then().response_is_200(when().getStatusCode());
         when().compare_specify_data(this.metaMapper.updateBridgeString);
         then().response_is_true();
-    }
+         */
+    
 }

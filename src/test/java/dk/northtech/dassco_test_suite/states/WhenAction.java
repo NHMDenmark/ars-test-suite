@@ -26,6 +26,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.Gson;
 import com.tngtech.jgiven.Stage;
 import com.tngtech.jgiven.annotation.ProvidedScenarioState;
 
@@ -75,15 +78,15 @@ public class WhenAction extends Stage<WhenAction> {
     @ProvidedScenarioState
     private String writeRole1ClientSecret;
     @ProvidedScenarioState
-    private int specifyCollectionId;
+    private String specifyCollectionId;
 
     // Created state
     @ProvidedScenarioState
     private boolean compareResult;
 
     // Specify credentials and client
-    private final SpecifyCredentials specifyCredentials = new SpecifyCredentials(this.specifyCollectionId);
-    //private final SpecifyClient specifyClient = new SpecifyClient(specifyCredentials);
+    private final SpecifyCredentials specifyCredentials = new SpecifyCredentials();
+    private final SpecifyClient specifyClient = new SpecifyClient(specifyCredentials);
 
     // Objectmapper
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -1798,6 +1801,33 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
+    public WhenAction specimen_is_in_specify(String collection_object_id) throws JSONException, JsonProcessingException{
+        String response = null;
+        try {
+            response = specifyClient.get("collectionobject", null).filter("id", collection_object_id).executeGetBody();
+            logger.info(response);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        this.compareResult = specify_has_field_value_in_response(response, "meta.total_count", "1");
+        return self();
+    }
+
+    public WhenAction get_and_compare_specify_data_with_model_data(String collection_object_id) throws JSONException, JsonProcessingException{
+        String response = null;
+        try {
+            response = specifyClient.get("collectionobjectattachment", null).filter("collectionobject_id", collection_object_id).limit(10).executeGetBody();
+            logger.info(response);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+        this.compareResult = specify_has_field_value_in_response(response, "meta.total_count", "1");
+
+        return self();
+    }
+
     // Helper functions:
     public HttpRequest postRequestBuilder(String entityType, String i_role, String c_role, String i_name, String c_name, String p_name, String w_name){
 
@@ -2225,5 +2255,43 @@ public class WhenAction extends Stage<WhenAction> {
         else {
             return model.equals(asset);
             }        
+    }
+
+    public Boolean specify_has_field_value_in_response(String response, String keyPath, String expectedValue) {
+        Gson gson = new Gson();
+        try {
+            JsonElement root = gson.fromJson(response, JsonElement.class);
+            JsonElement current = root;
+
+            String[] parts = keyPath.split("\\.");
+
+            for (String part : parts) {
+                // Handle array indexes like objects[0]
+                if (part.contains("[") && part.contains("]")) {
+                    String fieldName = part.substring(0, part.indexOf("["));
+                    int index = Integer.parseInt(part.substring(part.indexOf("[") + 1, part.indexOf("]")));
+
+                    if (!current.getAsJsonObject().has(fieldName)) return false;
+
+                    JsonArray array = current.getAsJsonObject().getAsJsonArray(fieldName);
+                    if (array.size() <= index) return false;
+
+                    current = array.get(index);
+                } else {
+                    if (!current.getAsJsonObject().has(part)) return false;
+                    current = current.getAsJsonObject().get(part);
+                }
+            }
+
+            // At this point, current should be the final value
+            if (current.isJsonNull()) return expectedValue == null;
+
+            String actualValue = current.getAsString();
+            return expectedValue.equals(actualValue);
+
+        } catch (Exception e) {
+            System.err.println("Failed to check nested key path: " + e.getMessage());
+            return false;
+        }
     }
 }

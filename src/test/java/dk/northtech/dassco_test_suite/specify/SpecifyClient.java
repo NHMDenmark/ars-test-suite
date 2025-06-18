@@ -210,6 +210,44 @@ public class SpecifyClient {
             }
             return result;
         }
+    
+
+        public String executeGetBody() {
+
+            StringBuilder qs = new StringBuilder()
+                    .append("limit=").append(limit)
+                    .append("&offset=").append(offset);
+
+            if (sort != null && !sort.isBlank()) {
+                qs.append("&orderby=")
+                        .append(URLEncoder.encode(sort, StandardCharsets.UTF_8));
+            }
+            for (var e : filters.entrySet()) {
+                qs.append('&')
+                        .append(URLEncoder.encode(e.getKey(), StandardCharsets.UTF_8))
+                        .append('=')
+                        .append(URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8));
+            }
+
+            String urlExt = "/api/specify/" + objectName;
+            String body;
+            if (objectId != null){
+                urlExt = "/api/specify/" + objectName + "/?attachment=" + objectId;
+                System.out.println(urlExt);
+                HttpRequest req = baseRequestBuilder(urlExt)
+                    .GET()
+                    .build();
+                body = sendRequest(req);               
+            }
+            else{
+                HttpRequest req = baseRequestBuilder(urlExt + "/?" + qs)
+                    .GET()
+                    .build();
+                body = sendRequest(req);
+            }
+                
+            return body;
+        }
     }
 
     public class DeleteAssetBuilder{
