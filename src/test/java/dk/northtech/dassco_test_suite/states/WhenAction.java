@@ -32,7 +32,9 @@ import com.google.gson.Gson;
 import com.tngtech.jgiven.Stage;
 import com.tngtech.jgiven.annotation.ProvidedScenarioState;
 
+import dk.northtech.dassco_test_suite.metadata_model.LegalityModel;
 import dk.northtech.dassco_test_suite.metadata_model.Metadata;
+import dk.northtech.dassco_test_suite.metadata_model.UpdateMetadata;
 import dk.northtech.dassco_test_suite.specify.SpecifyCredentials;
 import dk.northtech.dassco_test_suite.specify.SpecifyClient;
 
@@ -1770,6 +1772,19 @@ public class WhenAction extends Stage<WhenAction> {
         ObjectMapper OM = new ObjectMapper();
 
         while(true){
+
+            // wait first to allow status change to happen, when updating data for an already specify synced asset
+            Instant currentTime = Instant.now();
+            if(Duration.between(startTime, currentTime).compareTo(timeout) >= 0){
+                logger.error("Timeout. Not attempting to synchronize anymore.");
+                break;
+            }
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             // Check:
             a_GET_request_is_sent_to_get_an_assets_status(assetGuid);
 
@@ -1784,17 +1799,6 @@ public class WhenAction extends Stage<WhenAction> {
                 logger.info("Specify has synchronized.");
         
                 break;
-            }
-
-            Instant currentTime = Instant.now();
-            if(Duration.between(startTime, currentTime).compareTo(timeout) >= 0){
-                logger.error("Timeout. Not attempting to synchronize anymore.");
-                break;
-            }
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
 
         }
@@ -1813,7 +1817,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction get_and_compare_specify_data_with_model_data(String collection_object_id) throws JSONException, JsonProcessingException{
+    public WhenAction get_and_compare_specify_data_with_model_data(String collection_object_id, UpdateMetadata updateMetadata) throws JSONException, JsonProcessingException{
         String response = null;
         try {
             response = specifyClient.get("collectionobjectattachment", null).filter("collectionobject_id", collection_object_id).limit(10).executeGetBody();
@@ -1822,13 +1826,95 @@ public class WhenAction extends Stage<WhenAction> {
             e.printStackTrace();
         }
 
+        String fileType = updateMetadata.getFile_formats().getFirst().toLowerCase();
 
-        this.compareResult = specify_has_field_value_in_response(response, "meta.total_count", "1");
+        String specifyFilename = updateMetadata.getAsset_guid() + "." + fileType;
+        String remarks = updateMetadata.getSpecify_attachment_remarks();
+        String title = updateMetadata.getSpecify_attachment_title();
+        String isPublic = updateMetadata.getMake_public().toString();
+        String dateAssetTaken = updateMetadata.getDate_asset_taken();
+
+        LegalityModel legality = updateMetadata.getLegality();
+        String copyright = legality.getCopyright();
+        String license = legality.getLicense();
+        String credit = legality.getCredit();
+
+
+        Map<String, String> valueList = new HashMap<String, String>();
+
+        valueList.put("title", title);
+        valueList.put("remarks", remarks);
+        valueList.put("origfilename", specifyFilename);
+        valueList.put("mimetype", fileType);
+        valueList.put("copyrightholder", copyright);
+        valueList.put("credit", credit);
+        valueList.put("license", license);
+        valueList.put("ispublic", isPublic);
+        // valueList.put("filecreateddate", token); // maybe only the date, not timestamp // add this later
+
+        for (Map.Entry<String, String> entry : valueList.entrySet()) {
+            String key = entry.getKey();
+            String expectedValue = entry.getValue();
+            
+            Boolean currentResult = specify_has_field_value_in_response(response, key, expectedValue);
+            if (!currentResult) {
+                this.compareResult = false;
+                return self();
+            }
+        }
+        this.compareResult = true;
+        return self();
+    }
+
+    public WhenAction get_and_compare_specify_updated_data_with_model_data(String collection_object_id, UpdateMetadata updateMetadata) throws JSONException, JsonProcessingException{
+        String response = null;
+        try {
+            response = specifyClient.get("collectionobjectattachment", null).filter("collectionobject_id", collection_object_id).limit(10).executeGetBody();
+            logger.info(response);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        String remarks = updateMetadata.getSpecify_attachment_remarks();
+
+        LegalityModel legality = updateMetadata.getLegality();
+        String credit = legality.getCredit();
+
+        Map<String, String> valueList = new HashMap<String, String>();
+
+        valueList.put("remarks", remarks);
+        valueList.put("credit", credit);
+
+        for (Map.Entry<String, String> entry : valueList.entrySet()) {
+            String key = entry.getKey();
+            String expectedValue = entry.getValue();
+            
+            Boolean currentResult = specify_has_field_value_in_response(response, key, expectedValue);
+            if (!currentResult) {
+                this.compareResult = false;
+                return self();
+            }
+        }
+        this.compareResult = true;
+        return self();
+    }
+
+    public WhenAction a_DELETE_request_is_sent_to_delete_an_attachment_from_a_speciment(String collection_object_id) throws JSONException, JsonProcessingException{
+
+
+
+        try {
+            response = this.specifyClient.get("collectionobject", null).filter("id", collection_object_id).execute();
+            
+        } catch (Exception e){
+            e.printStackTrace();
+        }
 
         return self();
     }
 
-    // Helper functions:
+
+    // Helper functions: 
     public HttpRequest postRequestBuilder(String entityType, String i_role, String c_role, String i_name, String c_name, String p_name, String w_name){
 
         HttpRequest.Builder newRequest = HttpRequest.newBuilder();

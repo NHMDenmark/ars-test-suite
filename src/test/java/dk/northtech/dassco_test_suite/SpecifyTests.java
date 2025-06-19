@@ -19,8 +19,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import dk.northtech.dassco_test_suite.metadata_model.Metadata;
 import dk.northtech.dassco_test_suite.metadata_model.MetadataMapper;
 import dk.northtech.dassco_test_suite.metadata_model.UpdateMetadata;
-import dk.northtech.dassco_test_suite.specify.SpecifyClient;
-import dk.northtech.dassco_test_suite.specify.SpecifyCredentials;
 import dk.northtech.dassco_test_suite.states.GivenState;
 import dk.northtech.dassco_test_suite.states.ThenOutcome;
 import dk.northtech.dassco_test_suite.states.WhenAction;
@@ -34,10 +32,12 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
     private final MetadataMapper metaMapper = new MetadataMapper();
     private final Metadata specifyBridge = metaMapper.bridge;
     private final UpdateMetadata updateBridge = metaMapper.updateBridge;
+    private final UpdateMetadata updateSecondBridge = metaMapper.updateSecondBridge;
 
     // specimen id in specify - set for dummy specimen - if a new test specimen is created this needs to be updated here before running these tests
     private final String collection_object_id = "6105988";
 
+    // untested
     @Test
     @Order(0)
     // @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#specifyBridgeAssetAlreadyExists") // TODO 
@@ -67,6 +67,7 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
         then().response_is_true();
     }
 
+    // untested
     @Test
     @Order(2)
     // @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#modelBridgeAssetNotExists") // TODO 
@@ -82,18 +83,78 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
         logger.info("Synced with specify.");
     }
 
+    // untested
     @Test
     @Order(3)
     public void check_attachment_data_match() throws JSONException, JsonProcessingException {
         logger.info("Checking data match for relevant fields between specify attachement and model data.");
-        when().get_and_compare_specify_data_with_model_data(this.collection_object_id);
+        when().get_and_compare_specify_data_with_model_data(this.collection_object_id, this.updateBridge);
         then().response_is_true();
     }
-        /*
-        when().get_metadata_from_specify(this.collection_object_id, "guid");
+
+    // untested
+    @Test
+    @Order(4)
+    public void update_bridge_model_second_time() throws JSONException, JsonProcessingException{
+        logger.info("Updating specify bridge model with new values.");
+        given().dassco_asset_service_server_is_up();
+        when().update_asset_from_model(metaMapper.updateSecondBridgeString, this.updateSecondBridge.getAsset_guid());
         then().response_is_200(when().getStatusCode());
-        when().compare_specify_data(this.metaMapper.updateBridgeString);
+        logger.info("Waiting and checking asset status changing to synced with specify.");
+        given().dassco_file_proxy_server_is_up();
+        when().waiting_to_sync_with_specify(this.updateSecondBridge.getAsset_guid());
+        then().asset_status_is_specify_synchronised(when().a_GET_request_is_sent_to_get_an_asset(this.updateSecondBridge.getAsset_guid()).getInternalStatus());
+        logger.info("Updates synced with specify.");
+    }
+
+    // untested
+    @Test
+    @Order(5)
+    public void check_updated_data_match() throws JSONException, JsonProcessingException {
+        logger.info("Checking data match for updated fields between specify attachment and model data.");
+        when().get_and_compare_specify_updated_data_with_model_data(this.collection_object_id, this.updateSecondBridge);
         then().response_is_true();
-         */
+    }
     
+    @Test
+    @Order(Integer.MAX_VALUE - 3)
+    public void delete_specify_attachment() throws JSONException, JsonProcessingException{
+        logger.info("Delete the attachment from specify.");
+        when().a_DELETE_request_is_sent_to_delete_an_attachment_from_a_speciment(this.collection_object_id);
+    }
+
+    @Test
+    @Order(Integer.MAX_VALUE - 2)
+    public void unlock_asset(){
+        logger.info("Unlock asset in ARS.");
+        given().dassco_asset_service_server_is_up();
+        when().a_PUT_request_is_sent_to_unlock_an_asset(this.updateSecondBridge.getAsset_guid());
+        then().response_is_200(when().getStatusCode());
+    }
+
+    @Test
+    @Order(Integer.MAX_VALUE - 1)
+    public void open_share_delete_asset_files_and_resync_ERDA() throws JSONException, JsonProcessingException{
+        logger.info("Reopen share, delete files, resync w. ERDA for bridge asset.");
+        given().dassco_file_proxy_server_is_up();
+        when().a_POST_request_is_sent_to_open_a_share(this.updateSecondBridge.getAsset_guid());
+        then().response_is_200(when().getStatusCode())
+                .and().http_allocation_status_returns_success(when().getShareHttpAllocationStatus());
+        when().a_DELETE_request_is_sent_to_delete_all_files_for_an_asset(this.updateSecondBridge.getAsset_guid());
+        then().response_is_204(when().getStatusCode());
+        when().a_POST_request_is_sent_to_synchronize_with_erda(this.updateSecondBridge.getAsset_guid());
+        then().response_is_204(when().getStatusCode());
+        when().waiting_for_erda_to_synchronize(this.updateSecondBridge.getAsset_guid());
+        then().asset_status_is_completed(when().a_GET_request_is_sent_to_get_an_asset(this.updateSecondBridge.getAsset_guid()). getInternalStatus());
+    }
+
+    @Test
+    @Order(Integer.MAX_VALUE)
+    public void delete_asset_metadata(){
+        logger.info("Delete the asset metadata in ARS.");
+        given().dassco_asset_service_server_is_up();
+        when().a_DELETE_request_is_sent_to_delete_an_assets_metadata(this.updateSecondBridge.getAsset_guid());
+        then().response_is_204(when().getStatusCode());
+    }
+
 }

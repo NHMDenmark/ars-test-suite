@@ -251,15 +251,15 @@ public class SpecifyClient {
     }
 
     public class DeleteAssetBuilder{
-        private String assetGuid;
+        private String attachment_id;
 
-        public DeleteAssetBuilder(String assetGuid){
-            this.assetGuid = assetGuid;
+        public DeleteAssetBuilder(String attachment_id){
+            this.attachment_id = attachment_id;
         }
 
         public List<Map<String, Object>> execute(){
 
-            HttpRequest req = baseRequestBuilder("/api/specify/attachmentmetadata/" + assetGuid + "/")
+            HttpRequest req = baseRequestBuilder("/api/specify/attachmentmetadata/" + attachment_id + "/")
                     .DELETE()
                     .build();
 
