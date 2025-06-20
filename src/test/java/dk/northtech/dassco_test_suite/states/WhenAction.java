@@ -37,6 +37,7 @@ import dk.northtech.dassco_test_suite.metadata_model.Metadata;
 import dk.northtech.dassco_test_suite.metadata_model.UpdateMetadata;
 import dk.northtech.dassco_test_suite.specify.SpecifyCredentials;
 import dk.northtech.dassco_test_suite.specify.SpecifyClient;
+import jakarta.annotation.Nullable;
 
 
 public class WhenAction extends Stage<WhenAction> {
@@ -1900,16 +1901,45 @@ public class WhenAction extends Stage<WhenAction> {
     }
 
     public WhenAction a_DELETE_request_is_sent_to_delete_an_attachment_from_a_speciment(String collection_object_id) throws JSONException, JsonProcessingException{
-
-
-
+        List<Map<String, Object>> response = new ArrayList<>();
+        String attachmentId = null;
         try {
-            response = this.specifyClient.get("collectionobject", null).filter("id", collection_object_id).execute();
+            response = this.specifyClient.get("collectionobjectattachment", null).filter("collectionobject_id", collection_object_id).limit(2).execute();
             
         } catch (Exception e){
             e.printStackTrace();
         }
 
+        if (response.size() != 1){
+            logger.info("Found either multiple attachments or 0 attachments for specimen with collectionobject_id = " + collection_object_id + ". There should be 1 attachment.");
+            this.compareResult = false;
+            return self();
+        }
+        
+        try{
+            Object attachmentObj = response.get(0).get("attachment");
+            if (attachmentObj instanceof Map) {
+                Map<String, Object> attachmentMap = (Map<String, Object>) attachmentObj;
+                attachmentId = attachmentMap.get("id").toString();
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        if (attachmentId == null){
+            logger.info("Unable to find the attachment id.");
+            this.compareResult = false;
+            return self();
+        }
+
+        try {            
+            this.specifyClient.delete(attachmentId).execute();        
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        this.compareResult = true;
         return self();
     }
 

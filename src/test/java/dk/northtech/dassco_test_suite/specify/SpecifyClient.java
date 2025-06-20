@@ -124,8 +124,8 @@ public class SpecifyClient {
         return new GetBuilder(objectName, objectId);
     }
 
-    public DeleteAssetBuilder delete(String assetGuid){
-        return new DeleteAssetBuilder(assetGuid);
+    public DeleteAttachmentBuilder delete(String assetGuid){
+        return new DeleteAttachmentBuilder(assetGuid);
     }
 
 
@@ -250,28 +250,30 @@ public class SpecifyClient {
         }
     }
 
-    public class DeleteAssetBuilder{
-        private String attachment_id;
+    public class DeleteAttachmentBuilder{
+        private final String attachment_id;
 
-        public DeleteAssetBuilder(String attachment_id){
+        public DeleteAttachmentBuilder(String attachment_id){
             this.attachment_id = attachment_id;
         }
 
-        public List<Map<String, Object>> execute(){
+        public Boolean execute(){
 
             HttpRequest req = baseRequestBuilder("/api/specify/attachmentmetadata/" + attachment_id + "/")
                     .DELETE()
                     .build();
 
-            String body = sendRequest(req);
-            JsonObject jsonObject = gson.fromJson(body, JsonObject.class);
-            JsonArray objects = jsonObject.getAsJsonArray("objects");
-            var listType = new TypeToken<Map<String,Object>>(){}.getType();
-            List<Map<String,Object>> result = new ArrayList<>();
-            for (var el : objects) {
-                result.add(gson.fromJson(el, listType));
+            try {
+                HttpResponse<String> res = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+
+                if(res.statusCode() >= 200 && res.statusCode() < 300) {
+                    return true;
+                } else {
+                    throw new RuntimeException("API error (HTTP " + res.statusCode() + "): " + res.body());
+                }
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
             }
-            return result;
         }
     }
 }

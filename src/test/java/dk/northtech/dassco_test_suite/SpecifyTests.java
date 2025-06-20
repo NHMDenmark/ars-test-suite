@@ -115,12 +115,13 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
         when().get_and_compare_specify_updated_data_with_model_data(this.collection_object_id, this.updateSecondBridge);
         then().response_is_true();
     }
-    
+    // untested
     @Test
     @Order(Integer.MAX_VALUE - 3)
     public void delete_specify_attachment() throws JSONException, JsonProcessingException{
         logger.info("Delete the attachment from specify.");
         when().a_DELETE_request_is_sent_to_delete_an_attachment_from_a_speciment(this.collection_object_id);
+        then().response_is_true();
     }
 
     @Test
