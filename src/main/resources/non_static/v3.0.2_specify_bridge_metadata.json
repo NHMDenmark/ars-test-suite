@@ -1,8 +1,8 @@
 {
     "asset_created_by":null,
     "asset_deleted_by":null,
-    "asset_guid":"test-suite-bridge",
-    "asset_pid":"test-suite-bridge",
+    "asset_guid":"test-suite-bridge-4",
+    "asset_pid":"test-suite-bridge-4",
     "asset_subject":"specimen",
     "asset_updated_by":null,
     "audited":false,
@@ -22,7 +22,7 @@
     "date_pushed_to_specify":null,
     "digitiser":"Bille Bob",
     "external_publishers":[],
-    "file_formats":["JPEG"],
+    "file_formats":["PNG"],
     "funding":[],
     "institution":"NHMD",
     "issues":[],
@@ -42,7 +42,7 @@
     "restricted_access":[],
     "specify_attachment_remarks": "Here is the test attachment in all its glory!",
     "specify_attachment_title": "NHMD_7777777.jpeg",
-    "specimens":[{"institution": "NHMD", "collection": "NHMD Vascular Plants", "barcode": "77777777", "specimen_pid": "test-suite-bridge", "preparation_types": ["sheet"], "asset_preparation_type": "sheet"}],
+    "specimens":[{"institution": "NHMD", "collection": "NHMD Vascular Plants", "barcode": "077777777", "specimen_pid": "test-suite-bridge", "preparation_types": ["sheet"], "asset_preparation_type": "sheet"}],
     "status":"WORKING_COPY",
     "tags":{},
     "workstation":"WORKHERB0001"

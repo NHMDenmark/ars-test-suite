@@ -48,6 +48,7 @@ public class SpecifyClient {
         if (this.csrfToken != null) {
             builder.header("X-CSRFToken", this.csrfToken);
         }
+        
         return builder;
     }
 
@@ -124,8 +125,8 @@ public class SpecifyClient {
         return new GetBuilder(objectName, objectId);
     }
 
-    public DeleteAttachmentBuilder delete(String assetGuid){
-        return new DeleteAttachmentBuilder(assetGuid);
+    public DeleteAttachmentBuilder delete(String attachmentId){
+        return new DeleteAttachmentBuilder(attachmentId);
     }
 
 
@@ -188,7 +189,7 @@ public class SpecifyClient {
             String body;
             if (objectId != null){
                 urlExt = "/api/specify/" + objectName + "/?attachment=" + objectId;
-                System.out.println(urlExt);
+                
                 HttpRequest req = baseRequestBuilder(urlExt)
                     .GET()
                     .build();
@@ -233,7 +234,7 @@ public class SpecifyClient {
             String body;
             if (objectId != null){
                 urlExt = "/api/specify/" + objectName + "/?attachment=" + objectId;
-                System.out.println(urlExt);
+                
                 HttpRequest req = baseRequestBuilder(urlExt)
                     .GET()
                     .build();
@@ -259,13 +260,13 @@ public class SpecifyClient {
 
         public Boolean execute(){
 
-            HttpRequest req = baseRequestBuilder("/api/specify/attachmentmetadata/" + attachment_id + "/")
+            HttpRequest req = baseRequestBuilder("/api/specify/attachment/" + attachment_id + "/")
                     .DELETE()
                     .build();
 
             try {
                 HttpResponse<String> res = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
-
+                
                 if(res.statusCode() >= 200 && res.statusCode() < 300) {
                     return true;
                 } else {

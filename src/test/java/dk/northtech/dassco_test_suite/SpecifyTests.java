@@ -37,7 +37,6 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
     // specimen id in specify - set for dummy specimen - if a new test specimen is created this needs to be updated here before running these tests
     private final String collection_object_id = "6105988";
 
-    // untested
     @Test
     @Order(0)
     // @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#specifyBridgeAssetAlreadyExists") // TODO 
@@ -46,16 +45,17 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
         // create bridge model asset, including uploading file and syncing with erda.
         logger.info("Creating specify bridge asset from model.");
         given().dassco_asset_service_server_is_up();
-        when().a_POST_request_is_sent_based_on_model_data_to_create_an_assets_metadata(specifyBridge);
+        when().a_POST_request_is_sent_based_on_model_data_to_create_an_assets_metadata(this.specifyBridge);
         then().response_is_200(when().getStatusCode()).and().asset_internal_status_is_metadata_received(when().getInternalStatus());
-        logger.info("Adding file and syncing with ERDA for bridge asset.");
+        logger.info("Adding file.");
         given().dassco_file_proxy_server_is_up();
-        when().a_PUT_request_is_sent_to_upload_a_file("cat.png", "129932955", bridge_asset_guid, 1);
+        when().a_PUT_request_is_sent_to_upload_a_file_to_NHMD_Vascular_Plants("cat.png", "129932955", bridge_asset_guid, 1);
         then().response_is_200(when().getStatusCode());
+        logger.info("Syncing with ERDA for bridge asset.");
         when().a_POST_request_is_sent_to_synchronize_with_erda(bridge_asset_guid);
         then().response_is_204(when().getStatusCode());
         when().waiting_for_erda_to_synchronize(bridge_asset_guid);
-        then().asset_status_is_erda_synchronised(when().a_GET_request_is_sent_to_get_an_asset(bridge_asset_guid). getInternalStatus());
+        then().asset_status_is_erda_synchronised(when().a_GET_request_is_sent_to_get_an_asset(bridge_asset_guid).getInternalStatus());
         logger.info("Synced with ERDA.");        
     }
 
@@ -67,7 +67,6 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
         then().response_is_true();
     }
 
-    // untested
     @Test
     @Order(2)
     // @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#modelBridgeAssetNotExists") // TODO 
@@ -83,16 +82,16 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
         logger.info("Synced with specify.");
     }
 
-    // untested
     @Test
     @Order(3)
     public void check_attachment_data_match() throws JSONException, JsonProcessingException {
-        logger.info("Checking data match for relevant fields between specify attachement and model data.");
+        logger.info("Checking data match for relevant fields between specify attachent and model data.");
+        // // logger.info(this.collection_object_id + " :: " + this.updateBridge);
+        given().dassco_asset_service_server_is_up();
         when().get_and_compare_specify_data_with_model_data(this.collection_object_id, this.updateBridge);
         then().response_is_true();
     }
 
-    // untested
     @Test
     @Order(4)
     public void update_bridge_model_second_time() throws JSONException, JsonProcessingException{
@@ -107,7 +106,6 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
         logger.info("Updates synced with specify.");
     }
 
-    // untested
     @Test
     @Order(5)
     public void check_updated_data_match() throws JSONException, JsonProcessingException {
@@ -115,38 +113,48 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
         when().get_and_compare_specify_updated_data_with_model_data(this.collection_object_id, this.updateSecondBridge);
         then().response_is_true();
     }
-    // untested
+    
+    // untested - specify api is bugged, will have to manually remove the attachment through the specify ui 2/7-25
+    
     @Test
-    @Order(Integer.MAX_VALUE - 3)
+    @Order(Integer.MAX_VALUE - 4)
     public void delete_specify_attachment() throws JSONException, JsonProcessingException{
         logger.info("Delete the attachment from specify.");
         when().a_DELETE_request_is_sent_to_delete_an_attachment_from_a_speciment(this.collection_object_id);
         then().response_is_true();
     }
+     
 
     @Test
-    @Order(Integer.MAX_VALUE - 2)
+    @Order(Integer.MAX_VALUE - 3)
     public void unlock_asset(){
         logger.info("Unlock asset in ARS.");
         given().dassco_asset_service_server_is_up();
         when().a_PUT_request_is_sent_to_unlock_an_asset(this.updateSecondBridge.getAsset_guid());
-        then().response_is_200(when().getStatusCode());
+        then().response_is_204(when().getStatusCode());
+    }
+
+    @Test
+    @Order(Integer.MAX_VALUE - 2)
+    public void open_share() throws JSONException, JsonProcessingException{
+        logger.info("Reopen share.");
+        given().dassco_file_proxy_server_is_up();
+        when().a_POST_request_is_sent_to_open_a_share(this.updateSecondBridge.getAsset_guid(), this.updateSecondBridge.getInstitution(), this.updateSecondBridge.getCollection());
+        then().response_is_200(when().getStatusCode())
+                .and().http_allocation_status_returns_success(when().getShareHttpAllocationStatus());    
     }
 
     @Test
     @Order(Integer.MAX_VALUE - 1)
-    public void open_share_delete_asset_files_and_resync_ERDA() throws JSONException, JsonProcessingException{
-        logger.info("Reopen share, delete files, resync w. ERDA for bridge asset.");
+    public void delete_asset_files_and_resync_ERDA() throws JSONException, JsonProcessingException{
+        logger.info("Delete files and resync with ERDA.");
         given().dassco_file_proxy_server_is_up();
-        when().a_POST_request_is_sent_to_open_a_share(this.updateSecondBridge.getAsset_guid());
-        then().response_is_200(when().getStatusCode())
-                .and().http_allocation_status_returns_success(when().getShareHttpAllocationStatus());
-        when().a_DELETE_request_is_sent_to_delete_all_files_for_an_asset(this.updateSecondBridge.getAsset_guid());
+        when().a_DELETE_request_is_sent_to_delete_all_files_for_an_asset(this.updateSecondBridge.getAsset_guid(), this.updateSecondBridge.getInstitution(), this.updateSecondBridge.getCollection());
         then().response_is_204(when().getStatusCode());
         when().a_POST_request_is_sent_to_synchronize_with_erda(this.updateSecondBridge.getAsset_guid());
         then().response_is_204(when().getStatusCode());
         when().waiting_for_erda_to_synchronize(this.updateSecondBridge.getAsset_guid());
-        then().asset_status_is_completed(when().a_GET_request_is_sent_to_get_an_asset(this.updateSecondBridge.getAsset_guid()). getInternalStatus());
+        then().asset_status_is_erda_synchronised(when().a_GET_request_is_sent_to_get_an_asset(this.updateSecondBridge.getAsset_guid()).getInternalStatus());
     }
 
     @Test

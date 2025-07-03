@@ -38,7 +38,7 @@ public class MetadataMapper {
             this.parent = objectMapper.readValue(new File(this.path + this.parentFile), Metadata.class);
             this.derivative = objectMapper.readValue(new File(this.path + this.derivativeFile), Metadata.class);
             this.updateParent = objectMapper.readValue(new File(this.path + this.updateParentFile), UpdateMetadata.class);
-            this.parent = objectMapper.readValue(new File(this.path + this.specifyBridgeFile), Metadata.class);
+            this.bridge = objectMapper.readValue(new File(this.path + this.specifyBridgeFile), Metadata.class);
             this.updateBridge = objectMapper.readValue(new File(this.path + this.updateBridgeFile), UpdateMetadata.class);
             this.updateSecondBridge = objectMapper.readValue(new File(this.path + this.updateSecondBridgeFile), UpdateMetadata.class);
 

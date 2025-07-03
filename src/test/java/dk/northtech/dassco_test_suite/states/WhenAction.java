@@ -1424,6 +1424,22 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
+    public WhenAction a_DELETE_request_is_sent_to_delete_all_files_for_an_asset(String asset_guid, String institution, String collection){
+
+        getToken();
+        
+        collection = collection.replaceAll(" ", "%20");
+        request = HttpRequest.newBuilder()
+            .uri(URI.create(fileProxyUrl + "/assetfiles/" + institution + "/" + collection + "/" + asset_guid))
+            .header("Authorization", "Bearer " + token)
+            .DELETE()
+            .build();
+
+        makeApiCall(request);
+
+        return self();
+    }
+
     public WhenAction a_GET_request_is_sent_to_get_a_single_file_from_the_asset(){
 
         getToken();
@@ -1478,6 +1494,30 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
+    public WhenAction a_PUT_request_is_sent_to_upload_a_file_to_NHMD_Vascular_Plants(String fileName, String crc, String asset_guid, int allocation){
+
+        getToken();
+
+        String pathToFile = "src/main/resources/static/" + fileName;
+        Path file = Paths.get(pathToFile);
+
+        try {
+            HttpRequest.BodyPublisher bodyPublishers = HttpRequest.BodyPublishers.ofFile(file);
+
+            request = HttpRequest.newBuilder()
+                    .uri(URI.create(fileProxyUrl + "/assetfiles/NHMD/NHMD%20Vascular%20Plants/" + asset_guid + "/" + fileName + "?crc=" + crc + "&file_size_mb=" + allocation))
+                    .header("Authorization", "Bearer " + token)
+                    .PUT(bodyPublishers)
+                    .build();
+
+            makeApiCall(request);
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return self();
+    }
+
     public WhenAction a_DELETE_request_is_sent_to_delete_a_single_file_from_the_asset(){
 
         getToken();
@@ -1511,6 +1551,24 @@ public class WhenAction extends Stage<WhenAction> {
     public WhenAction a_POST_request_is_sent_to_open_a_share(String asset_guid) throws JSONException {
 
         String body = "{ \"assets\": [ { \"asset_guid\": \"" + asset_guid + "\", \"institution\": \"test-suite-institution\", \"collection\": \"test-suite-collection\" } ], \"users\": [ \"service-account-test-suite-service-user\" ], \"allocation_mb\": 10 }";
+
+        getToken();
+
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(fileProxyUrl + "/shares/assets/"+ asset_guid +"/createShare"))
+                .header("Authorization", "Bearer " + token)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+
+        makeApiCall(request);
+
+        return self();
+    }
+
+    public WhenAction a_POST_request_is_sent_to_open_a_share(String asset_guid, String institution, String collection) throws JSONException {
+
+        String body = "{ \"assets\": [ { \"asset_guid\": \"" + asset_guid + "\", \"institution\": \"" + institution + "\", \"collection\": \"" + collection + "\" } ], \"users\": [ \"service-account-test-suite-service-user\" ], \"allocation_mb\": 10 }";
 
         getToken();
 
@@ -1741,7 +1799,7 @@ public class WhenAction extends Stage<WhenAction> {
             JsonNode rootNode = OM.readTree(responseBody);
             String status = rootNode.get("status").asText();
 
-            if (!status.matches("COMPLETED")){
+            if (!status.matches("ERDA_SYNCHRONISED")){
                 logger.info("Erda hasn't synchronized yet. Trying again...");
             } else {
                 logger.info("Erda has synchronized.");
@@ -1810,7 +1868,7 @@ public class WhenAction extends Stage<WhenAction> {
         String response = null;
         try {
             response = specifyClient.get("collectionobject", null).filter("id", collection_object_id).executeGetBody();
-            logger.info(response);
+            
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -1822,17 +1880,17 @@ public class WhenAction extends Stage<WhenAction> {
         String response = null;
         try {
             response = specifyClient.get("collectionobjectattachment", null).filter("collectionobject_id", collection_object_id).limit(10).executeGetBody();
-            logger.info(response);
+            
         } catch (Exception e){
             e.printStackTrace();
         }
-
-        String fileType = updateMetadata.getFile_formats().getFirst().toLowerCase();
+        // logger.info(response);
+        String fileType = updateMetadata.getFile_formats().get(0).toLowerCase();
 
         String specifyFilename = updateMetadata.getAsset_guid() + "." + fileType;
         String remarks = updateMetadata.getSpecify_attachment_remarks();
         String title = updateMetadata.getSpecify_attachment_title();
-        String isPublic = updateMetadata.getMake_public().toString();
+        String isPublic = Boolean.toString(updateMetadata.isMake_public());
         String dateAssetTaken = updateMetadata.getDate_asset_taken();
 
         LegalityModel legality = updateMetadata.getLegality();
@@ -1846,7 +1904,7 @@ public class WhenAction extends Stage<WhenAction> {
         valueList.put("title", title);
         valueList.put("remarks", remarks);
         valueList.put("origfilename", specifyFilename);
-        valueList.put("mimetype", fileType);
+        valueList.put("mimetype", ("image/" + fileType));
         valueList.put("copyrightholder", copyright);
         valueList.put("credit", credit);
         valueList.put("license", license);
@@ -1856,9 +1914,10 @@ public class WhenAction extends Stage<WhenAction> {
         for (Map.Entry<String, String> entry : valueList.entrySet()) {
             String key = entry.getKey();
             String expectedValue = entry.getValue();
-            
-            Boolean currentResult = specify_has_field_value_in_response(response, key, expectedValue);
+            logger.info(key + " : " + expectedValue);
+            Boolean currentResult = specify_has_field_value_in_response(response, ("objects[0].attachment." + key), expectedValue);
             if (!currentResult) {
+                logger.info("Failed comparison for: " + key + " :: " + expectedValue);
                 this.compareResult = false;
                 return self();
             }
@@ -1871,7 +1930,7 @@ public class WhenAction extends Stage<WhenAction> {
         String response = null;
         try {
             response = specifyClient.get("collectionobjectattachment", null).filter("collectionobject_id", collection_object_id).limit(10).executeGetBody();
-            logger.info(response);
+            
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -1890,7 +1949,7 @@ public class WhenAction extends Stage<WhenAction> {
             String key = entry.getKey();
             String expectedValue = entry.getValue();
             
-            Boolean currentResult = specify_has_field_value_in_response(response, key, expectedValue);
+            Boolean currentResult = specify_has_field_value_in_response(response, "objects[0].attachment." + key, expectedValue);
             if (!currentResult) {
                 this.compareResult = false;
                 return self();
@@ -1902,7 +1961,7 @@ public class WhenAction extends Stage<WhenAction> {
 
     public WhenAction a_DELETE_request_is_sent_to_delete_an_attachment_from_a_speciment(String collection_object_id) throws JSONException, JsonProcessingException{
         List<Map<String, Object>> response = new ArrayList<>();
-        String attachmentId = null;
+        int attachmentId = -1;
         try {
             response = this.specifyClient.get("collectionobjectattachment", null).filter("collectionobject_id", collection_object_id).limit(2).execute();
             
@@ -1920,20 +1979,23 @@ public class WhenAction extends Stage<WhenAction> {
             Object attachmentObj = response.get(0).get("attachment");
             if (attachmentObj instanceof Map) {
                 Map<String, Object> attachmentMap = (Map<String, Object>) attachmentObj;
-                attachmentId = attachmentMap.get("id").toString();
+                attachmentId = (Integer)attachmentMap.get("id");
+                
             }
         } catch (Exception e){
             e.printStackTrace();
         }
 
-        if (attachmentId == null){
-            logger.info("Unable to find the attachment id.");
+        if (attachmentId == -1){
+            logger.info("Failed to get the attachment id from specify");
             this.compareResult = false;
             return self();
         }
 
+        String strAttachmentId = Integer.toString(attachmentId);
+
         try {            
-            this.specifyClient.delete(attachmentId).execute();        
+            this.specifyClient.delete(strAttachmentId).execute();        
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -2186,7 +2248,7 @@ public class WhenAction extends Stage<WhenAction> {
     public void makeApiCall(HttpRequest request){
         try {
             response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            logger.info(response.body());
+            // logger.info(response.body());
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -2203,8 +2265,6 @@ public class WhenAction extends Stage<WhenAction> {
             String ars_asset = get_asset_metadata(assetGuid);
             
             JsonNode asset_data = convert_json_to_node(ars_asset);
-
-            logger.info("ARS model: " +  ars_asset + "\nStatic Model: " + model);
             
             this.compareResult =  model_and_asset_data_match(model_data, asset_data);
             
@@ -2386,12 +2446,9 @@ public class WhenAction extends Stage<WhenAction> {
                 if (part.contains("[") && part.contains("]")) {
                     String fieldName = part.substring(0, part.indexOf("["));
                     int index = Integer.parseInt(part.substring(part.indexOf("[") + 1, part.indexOf("]")));
-
                     if (!current.getAsJsonObject().has(fieldName)) return false;
-
                     JsonArray array = current.getAsJsonObject().getAsJsonArray(fieldName);
                     if (array.size() <= index) return false;
-
                     current = array.get(index);
                 } else {
                     if (!current.getAsJsonObject().has(part)) return false;
@@ -2403,7 +2460,14 @@ public class WhenAction extends Stage<WhenAction> {
             if (current.isJsonNull()) return expectedValue == null;
 
             String actualValue = current.getAsString();
-            return expectedValue.equals(actualValue);
+            
+            if (expectedValue.equals(actualValue)) {
+                
+                return true;
+            } else {
+                logger.info(actualValue + " : " + expectedValue + " failed to match for " + keyPath);
+                return false;
+            }
 
         } catch (Exception e) {
             System.err.println("Failed to check nested key path: " + e.getMessage());
