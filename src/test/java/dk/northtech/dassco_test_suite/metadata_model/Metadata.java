@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
  @NoArgsConstructor
  @Builder
  public class Metadata {
- // for metadata version 3.0.2
+ // for metadata version 3.0.3
     private String asset_created_by;
     private String asset_deleted_by;
     private String asset_guid;
@@ -60,6 +60,7 @@ import lombok.NoArgsConstructor;
     private String metadata_source;
     private String metadata_updated_by;
     private String metadata_version;
+    private String mime_type;
     private String mos_id;
     private boolean multi_specimen;
   

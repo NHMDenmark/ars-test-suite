@@ -56,6 +56,7 @@ public class UpdateMetadata{
     private String metadata_source;
     private String metadata_updated_by;
     private String metadata_version;
+    private String mime_type;
     private String mos_id;
     private boolean multi_specimen;
     @Builder.Default

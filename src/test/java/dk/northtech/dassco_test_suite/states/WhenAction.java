@@ -1948,12 +1948,15 @@ public class WhenAction extends Stage<WhenAction> {
         for (Map.Entry<String, String> entry : valueList.entrySet()) {
             String key = entry.getKey();
             String expectedValue = entry.getValue();
+
+            if (!key.equals("mime_type")){
             
-            Boolean currentResult = specify_has_field_value_in_response(response, "objects[0].attachment." + key, expectedValue);
-            if (!currentResult) {
-                this.compareResult = false;
-                return self();
-            }
+                Boolean currentResult = specify_has_field_value_in_response(response, "objects[0].attachment." + key, expectedValue);
+                if (!currentResult) {
+                    this.compareResult = false;
+                    return self();
+                }
+            }    
         }
         this.compareResult = true;
         return self();

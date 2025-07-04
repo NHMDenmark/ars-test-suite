@@ -23,12 +23,12 @@ public class MetadataMapper {
     // define paths for the json files
     private String path = "src/main/resources/non_static/";
 
-    private final String parentFile = "v3.0.2_model_parent_metadata.json";
-    private final String derivativeFile = "v3.0.2_model_derivative_metadata.json";
-    private final String updateParentFile = "v3.0.2_update_parent_metadata.json";
-    private final String specifyBridgeFile = "v3.0.2_specify_bridge_metadata.json";
-    private final String updateBridgeFile = "v3.0.2_update_specify_bridge_metadata.json";
-    private final String updateSecondBridgeFile = "v3.0.2_update_second_bridge_metadata.json";
+    private final String parentFile = "v3.0.3_model_parent_metadata.json";
+    private final String derivativeFile = "v3.0.3_model_derivative_metadata.json";
+    private final String updateParentFile = "v3.0.3_update_parent_metadata.json";
+    private final String specifyBridgeFile = "v3.0.3_specify_bridge_metadata.json";
+    private final String updateBridgeFile = "v3.0.3_update_specify_bridge_metadata.json";
+    private final String updateSecondBridgeFile = "v3.0.3_update_second_bridge_metadata.json";
 
     public MetadataMapper() {
 
