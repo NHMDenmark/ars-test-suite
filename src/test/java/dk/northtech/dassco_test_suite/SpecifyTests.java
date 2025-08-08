@@ -31,11 +31,16 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
 
     private final MetadataMapper metaMapper = new MetadataMapper();
     private final Metadata specifyBridge = metaMapper.bridge;
+    private final Metadata msoMetadata = metaMapper.mso;
     private final UpdateMetadata updateBridge = metaMapper.updateBridge;
     private final UpdateMetadata updateSecondBridge = metaMapper.updateSecondBridge;
+    private final UpdateMetadata msoUpdate = metaMapper.msoUpdate;
 
-    // specimen id in specify - set for dummy specimen - if a new test specimen is created this needs to be updated here before running these tests
-    private final String collection_object_id = "6105988";
+
+    // specimen ids in specify - set for dummy specimens - if a new test specimen is created this needs to be updated here before running these tests
+    private final String collection_object_id = "6105988"; // catalogue number 077777777
+    private final String first_mso_collection_object_id = "6106005"; // catalogue number 088888888
+    private final String second_mso_collection_object_id = "6106006"; // catalogue number 099999999
 
     @Test
     @Order(0)
@@ -61,9 +66,11 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
 
     @Test
     @Order(1)
-    public void check_specimen_is_in_specify() throws JSONException, JsonProcessingException {
-        logger.info("Checking specimen exist in specify.");
+    public void check_specimens_is_in_specify() throws JSONException, JsonProcessingException {
+        logger.info("Checking specimens exist in specify.");
         when().specimen_is_in_specify(this.collection_object_id);
+        then().response_is_true();
+        when().specimen_is_in_specify(this.second_collection_object_id);
         then().response_is_true();
     }
 
@@ -114,40 +121,111 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
         then().response_is_true();
     }
     
-    // untested - specify api is bugged, will have to manually remove the attachment through the specify ui 2/7-25
-    
+    @Test
+    @Order(6)
+    // @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#msoAssetAlreadyExists") // TODO 
+    public void create_mso_metadata_from_model() throws JSONException, JsonProcessingException{
+        String mso_guid = this.msoMetadata.getAsset_guid();
+        // create mso model asset, including uploading file and syncing with erda.
+        logger.info("Creating mso asset from model.");
+        given().dassco_asset_service_server_is_up();
+        when().a_POST_request_is_sent_based_on_model_data_to_create_an_assets_metadata(this.msoMetadata);
+        then().response_is_200(when().getStatusCode()).and().asset_internal_status_is_metadata_received(when().getInternalStatus());
+        logger.info("Adding file.");
+        given().dassco_file_proxy_server_is_up();
+        when().a_PUT_request_is_sent_to_upload_a_file_to_NHMD_Vascular_Plants("cat.png", "129932955", mso_guid, 1);
+        then().response_is_200(when().getStatusCode());
+        logger.info("Syncing with ERDA for mso asset.");
+        when().a_POST_request_is_sent_to_synchronize_with_erda(mso_guid);
+        then().response_is_204(when().getStatusCode());
+        when().waiting_for_erda_to_synchronize(mso_guid);
+        then().asset_status_is_erda_synchronised(when().a_GET_request_is_sent_to_get_an_asset(mso_guid).getInternalStatus());
+        logger.info("Synced with ERDA.");        
+    }
+
+    @Test
+    @Order(7)
+    // @DisabledIf("dk.northtech.dassco_test_suite.conditions.Conditions#msoAssetNotExists") // TODO 
+    public void update_mso_model_and_check_values() throws JSONException, JsonProcessingException{
+        logger.info("Updating mso model with new values.");
+        given().dassco_asset_service_server_is_up();
+        when().update_asset_from_model(metaMapper.msoUpdateString, this.msoUpdate.getAsset_guid());
+        then().response_is_200(when().getStatusCode());
+        logger.info("Waiting and checking mso status changing to synced with specify.");
+        given().dassco_file_proxy_server_is_up();
+        when().waiting_to_sync_with_specify(this.msoUpdate.getAsset_guid());
+        then().asset_status_is_specify_synchronised(when().a_GET_request_is_sent_to_get_an_asset(this.msoUpdate.getAsset_guid()).getInternalStatus());
+        logger.info("MSO synced with specify.");
+    }
+
+    @Test
+    @Order(8)
+    public void check_mso_attachment_data_match() throws JSONException, JsonProcessingException {
+        logger.info("Checking data match for relevant fields between mso attachment and model data.");
+        // logger.info(this.collection_object_id + " :: " + this.msoUpdate);
+        given().dassco_asset_service_server_is_up();
+        when().get_and_compare_specify_data_with_model_data(this.first_mso_collection_object_id, this.msoUpdate);
+        then().response_is_true();
+        given().dassco_asset_service_server_is_up();
+        when().get_and_compare_specify_data_with_model_data(this.second_mso_collection_object_id, this.msoUpdate);
+        then().response_is_true();
+    }
+
+    // untested - specify api is bugged, will have to manually remove the attachment through the specify ui 2/7-25 https://discourse.specifysoftware.org/t/deleting-collectionobjectattachment-via-api-endpoints/2670/2
     @Test
     @Order(Integer.MAX_VALUE - 4)
-    public void delete_specify_attachment() throws JSONException, JsonProcessingException{
-        logger.info("Delete the attachment from specify.");
+    public void delete_specify_attachments() throws JSONException, JsonProcessingException{
+        logger.info("Delete the attachments from specify.");
         when().a_DELETE_request_is_sent_to_delete_an_attachment_from_a_speciment(this.collection_object_id);
+        then().response_is_true();
+        // mso // TODO figure out how this actually work in specify before we can delete
+        when().a_DELETE_request_is_sent_to_delete_an_attachment_from_a_speciment(this.first_mso_collection_object_id);
+        then().response_is_true();
+        when().a_DELETE_request_is_sent_to_delete_an_attachment_from_a_speciment(this.second_mso_collection_object_id);
         then().response_is_true();
     }
      
 
     @Test
     @Order(Integer.MAX_VALUE - 3)
-    public void unlock_asset(){
-        logger.info("Unlock asset in ARS.");
+    public void unlock_assets(){
+        logger.info("Unlock assets in ARS.");
         given().dassco_asset_service_server_is_up();
         when().a_PUT_request_is_sent_to_unlock_an_asset(this.updateSecondBridge.getAsset_guid());
+        then().response_is_204(when().getStatusCode());
+        // mso
+        given().dassco_asset_service_server_is_up();
+        when().a_PUT_request_is_sent_to_unlock_an_asset(this.msoUpdate.getAsset_guid());
         then().response_is_204(when().getStatusCode());
     }
 
     @Test
     @Order(Integer.MAX_VALUE - 2)
-    public void open_share() throws JSONException, JsonProcessingException{
-        logger.info("Reopen share.");
+    public void open_shares() throws JSONException, JsonProcessingException{
+        logger.info("Reopen shares.");
         given().dassco_file_proxy_server_is_up();
         when().a_POST_request_is_sent_to_open_a_share(this.updateSecondBridge.getAsset_guid(), this.updateSecondBridge.getInstitution(), this.updateSecondBridge.getCollection());
         then().response_is_200(when().getStatusCode())
-                .and().http_allocation_status_returns_success(when().getShareHttpAllocationStatus());    
+                .and().http_allocation_status_returns_success(when().getShareHttpAllocationStatus());
+        // mso
+        given().dassco_file_proxy_server_is_up();
+        when().a_POST_request_is_sent_to_open_a_share(this.msoUpdate.getAsset_guid(), this.msoUpdate.getInstitution(), this.msoUpdate.getCollection());
+        then().response_is_200(when().getStatusCode())
+                .and().http_allocation_status_returns_success(when().getShareHttpAllocationStatus());      
     }
 
     @Test
     @Order(Integer.MAX_VALUE - 1)
-    public void delete_asset_files_and_resync_ERDA() throws JSONException, JsonProcessingException{
+    public void delete_assets_files_and_resync_ERDA() throws JSONException, JsonProcessingException{
         logger.info("Delete files and resync with ERDA.");
+        given().dassco_file_proxy_server_is_up();
+        when().a_DELETE_request_is_sent_to_delete_all_files_for_an_asset(this.updateSecondBridge.getAsset_guid(), this.updateSecondBridge.getInstitution(), this.updateSecondBridge.getCollection());
+        then().response_is_204(when().getStatusCode());
+        when().a_POST_request_is_sent_to_synchronize_with_erda(this.updateSecondBridge.getAsset_guid());
+        then().response_is_204(when().getStatusCode());
+        when().waiting_for_erda_to_synchronize(this.updateSecondBridge.getAsset_guid());
+        then().asset_status_is_erda_synchronised(when().a_GET_request_is_sent_to_get_an_asset(this.updateSecondBridge.getAsset_guid()).getInternalStatus());
+        // mso
         given().dassco_file_proxy_server_is_up();
         when().a_DELETE_request_is_sent_to_delete_all_files_for_an_asset(this.updateSecondBridge.getAsset_guid(), this.updateSecondBridge.getInstitution(), this.updateSecondBridge.getCollection());
         then().response_is_204(when().getStatusCode());
