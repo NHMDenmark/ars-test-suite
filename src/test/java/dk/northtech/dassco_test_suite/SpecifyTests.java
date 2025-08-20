@@ -192,14 +192,15 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
 
     // specify api is bugged, we are detaching the collectionobjectattachment from the collection object, 2/7-25 https://discourse.specifysoftware.org/t/deleting-collectionobjectattachment-via-api-endpoints/2670/2
     @Test
-    @Order(Integer.MAX_VALUE - 9)
+    @Order(Integer.MAX_VALUE - 7)
     public void delete_specify_attachments() throws JSONException, JsonProcessingException{
         logger.info("Delete the bridge attachment from specify.");       
         when().deleting_from_specify_by_deattaching(this.collection_object_id);
         then().response_is_true();
     }
+    
     @Test
-    @Order(Integer.MAX_VALUE - 8)
+    @Order(Integer.MAX_VALUE - 6)
     public void delete_mso_attachments() throws JSONException, JsonProcessingException{
         logger.info("Delete the mso attachments from specify.");       
         when().deleting_from_specify_by_deattaching(this.first_mso_collection_object_id);
@@ -209,7 +210,7 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
     }    
 
     @Test
-    @Order(Integer.MAX_VALUE - 7)
+    @Order(Integer.MAX_VALUE - 5)
     public void unlock_asset(){
         logger.info("Unlock bridge asset in ARS.");
         given().dassco_asset_service_server_is_up();
@@ -218,33 +219,13 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
     }
 
     @Test
-    @Order(Integer.MAX_VALUE - 6)
+    @Order(Integer.MAX_VALUE - 4)
     public void unlock_mso_asset(){
         // mso
         logger.info("Unlock mso asset in ARS.");
         given().dassco_asset_service_server_is_up();
         when().a_PUT_request_is_sent_to_unlock_an_asset(this.mso_asset_guid);
         then().response_is_204(when().getStatusCode());
-    }
-
-    @Test
-    @Order(Integer.MAX_VALUE - 5)
-    public void open_bridge_share() throws JSONException, JsonProcessingException{
-        logger.info("Reopen shares.");
-        given().dassco_file_proxy_server_is_up();
-        when().a_POST_request_is_sent_to_open_a_share(this.bridge_asset_guid, this.bridge_institution, this.bridge_collection);
-        then().response_is_200(when().getStatusCode())
-                .and().http_allocation_status_returns_success(when().getShareHttpAllocationStatus());
-    }
-    // mso
-    @Test
-    @Order(Integer.MAX_VALUE - 4)
-    public void open_mso_share() throws JSONException, JsonProcessingException{
-        logger.info("Reopen shares.");
-        given().dassco_file_proxy_server_is_up();
-        when().a_POST_request_is_sent_to_open_a_share(this.mso_asset_guid, this.mso_institution, this.mso_collection);
-        then().response_is_200(when().getStatusCode())
-                .and().http_allocation_status_returns_success(when().getShareHttpAllocationStatus());      
     }
 
     @Test
