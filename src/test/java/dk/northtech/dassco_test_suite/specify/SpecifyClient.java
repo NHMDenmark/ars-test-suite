@@ -4,12 +4,19 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
+import dk.northtech.dassco_test_suite.states.WhenAction;
+
 import static org.junit.Assert.assertNotEquals;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublisher;
+import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -127,6 +134,10 @@ public class SpecifyClient {
 
     public DeleteAttachmentBuilder delete(String attachmentId){
         return new DeleteAttachmentBuilder(attachmentId);
+    }
+
+    public PutBuilder put(String objectId, String type, int version){
+        return new PutBuilder(objectId, type, version);
     }
 
 
@@ -248,6 +259,51 @@ public class SpecifyClient {
             }
                 
             return body;
+        }
+    }
+
+    public class PutBuilder{
+        private static final Logger logger = LoggerFactory.getLogger(PutBuilder.class);
+
+        private final String object_id;
+        private final String type;
+        private final int version;
+
+        public PutBuilder(String object_id, String type, int version){
+            this.object_id = object_id;
+            this.version = version;
+            this.type = type;
+        }
+
+        public Boolean execute(){
+
+            String body = null;
+
+            if ("collectionobject".equals(type)){
+            body = "{ \"version\":" + version + ",  \"collectionobjectattachments\":[]}";
+            }
+            if ("collectionobjectattachment".equals(type)){
+            body = "{ \"version\":" + version + ",  \"attachment\":{}}";
+            }
+            // logger.info(body);
+            if(body==null){
+                return false;
+            }
+
+            HttpRequest req = baseRequestBuilder("/api/specify/" + type + "/" + object_id + "/")
+                    .PUT(BodyPublishers.ofString(body, StandardCharsets.UTF_8))
+                    .build();
+            try {
+                HttpResponse<String> res = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+                
+                if(res.statusCode() >= 200 && res.statusCode() < 300) {
+                    return true;
+                } else {
+                    throw new RuntimeException("API error (HTTP " + res.statusCode() + "): " + res.body());
+                }
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

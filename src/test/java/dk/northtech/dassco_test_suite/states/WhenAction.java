@@ -39,7 +39,6 @@ import dk.northtech.dassco_test_suite.specify.SpecifyCredentials;
 import dk.northtech.dassco_test_suite.specify.SpecifyClient;
 import jakarta.annotation.Nullable;
 
-
 public class WhenAction extends Stage<WhenAction> {
     // Auth Token:
     @ProvidedScenarioState
@@ -95,18 +94,21 @@ public class WhenAction extends Stage<WhenAction> {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     // DASSCO-ASSET-SERVICE ENDPOINTS:
-    public WhenAction a_POST_request_is_sent_to_create_an_institution_or_workstation_or_pipeline_or_collection(String entityType, String i_role, String c_role, String i_name, String c_name, String p_name, String w_name){
+    public WhenAction a_POST_request_is_sent_to_create_an_institution_or_workstation_or_pipeline_or_collection(
+            String entityType, String i_role, String c_role, String i_name, String c_name, String p_name,
+            String w_name) {
 
         getToken();
 
         request = postRequestBuilder(entityType, i_role, c_role, i_name, c_name, p_name, w_name);
-        
+
         makeApiCall(request);
 
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_fail_the_creation_of_a_collection(String institution_name, String collection_name, boolean body_present){
+    public WhenAction a_POST_request_is_sent_to_fail_the_creation_of_a_collection(String institution_name,
+            String collection_name, boolean body_present) {
 
         getToken();
 
@@ -128,7 +130,8 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_fail_the_creation_of_an_institution(String institution_name, boolean body_present){
+    public WhenAction a_POST_request_is_sent_to_fail_the_creation_of_an_institution(String institution_name,
+            boolean body_present) {
 
         getToken();
 
@@ -136,7 +139,7 @@ public class WhenAction extends Stage<WhenAction> {
 
         if (body_present) {
             body = "{ \"name\": \"" + institution_name + "\" }";
-            if (institution_name == null){
+            if (institution_name == null) {
                 body = "{ \"name\" : null }";
             }
         }
@@ -153,7 +156,8 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_fail_the_creation_of_a_pipeline(String institution_name, boolean body_present, String pipeline_name){
+    public WhenAction a_POST_request_is_sent_to_fail_the_creation_of_a_pipeline(String institution_name,
+            boolean body_present, String pipeline_name) {
 
         getToken();
 
@@ -175,7 +179,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_create_an_out_of_service_workstation(){
+    public WhenAction a_POST_request_is_sent_to_create_an_out_of_service_workstation() {
 
         getToken();
 
@@ -183,7 +187,8 @@ public class WhenAction extends Stage<WhenAction> {
                 .uri(URI.create(assetServiceUrl + "/v1/institutions/test-suite-institution/workstations"))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
-                .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"test-suite-workstation-out-of-service\", \"status\":\"OUT_OF_SERVICE\", \"institution_name\": \"test-suite-institution\"}"))
+                .POST(HttpRequest.BodyPublishers.ofString(
+                        "{\"name\":\"test-suite-workstation-out-of-service\", \"status\":\"OUT_OF_SERVICE\", \"institution_name\": \"test-suite-institution\"}"))
                 .build();
 
         makeApiCall(request);
@@ -191,7 +196,8 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_fail_the_creation_of_a_workstation(String institution_name, boolean body_present, String status, String workstation_name){
+    public WhenAction a_POST_request_is_sent_to_fail_the_creation_of_a_workstation(String institution_name,
+            boolean body_present, String status, String workstation_name) {
 
         getToken();
 
@@ -213,7 +219,8 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_GET_request_is_sent_to_get_a_list_of_institutions_or_workstations_or_pipelines_or_collections(String entityType, String institution){
+    public WhenAction a_GET_request_is_sent_to_get_a_list_of_institutions_or_workstations_or_pipelines_or_collections(
+            String entityType, String institution) {
 
         request = getRequestBuilder(entityType, institution);
 
@@ -222,7 +229,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_GET_request_is_sent_to_get_an_institution(String institutionName){
+    public WhenAction a_GET_request_is_sent_to_get_an_institution(String institutionName) {
 
         getToken();
 
@@ -237,9 +244,9 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_PUT_request_is_sent_to_update_a_workstation(boolean invalidStatus){
+    public WhenAction a_PUT_request_is_sent_to_update_a_workstation(boolean invalidStatus) {
 
-        if (workstationStatus != null){
+        if (workstationStatus != null) {
             if (workstationStatus.equals("IN_SERVICE")) {
                 newWorkstationStatus = "OUT_OF_SERVICE";
             } else {
@@ -247,17 +254,19 @@ public class WhenAction extends Stage<WhenAction> {
             }
         }
 
-        if(invalidStatus){
+        if (invalidStatus) {
             newWorkstationStatus = "INVALID_STATUS";
         }
 
         getToken();
 
         request = HttpRequest.newBuilder()
-                .uri(URI.create(assetServiceUrl + "/v1/institutions/test-suite-institution/workstations/test-suite-workstation"))
+                .uri(URI.create(assetServiceUrl
+                        + "/v1/institutions/test-suite-institution/workstations/test-suite-workstation"))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
-                .PUT(HttpRequest.BodyPublishers.ofString("{\"name\":\"test-suite-workstation\", \"status\":\"" + newWorkstationStatus + "\", \"institution_name\": \"test-suite-institution\"}"))
+                .PUT(HttpRequest.BodyPublishers.ofString("{\"name\":\"test-suite-workstation\", \"status\":\""
+                        + newWorkstationStatus + "\", \"institution_name\": \"test-suite-institution\"}"))
                 .build();
 
         makeApiCall(request);
@@ -265,7 +274,8 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_PUT_request_is_sent_to_fail_to_update_workstation(String institution_name, String workstation_name, String status, boolean body_present){
+    public WhenAction a_PUT_request_is_sent_to_fail_to_update_workstation(String institution_name,
+            String workstation_name, String status, boolean body_present) {
 
         getToken();
 
@@ -276,7 +286,8 @@ public class WhenAction extends Stage<WhenAction> {
         }
 
         request = HttpRequest.newBuilder()
-                .uri(URI.create(assetServiceUrl + "/v1/institutions/" + institution_name + "/workstations/" + workstation_name))
+                .uri(URI.create(
+                        assetServiceUrl + "/v1/institutions/" + institution_name + "/workstations/" + workstation_name))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
                 .PUT(HttpRequest.BodyPublishers.ofString(body))
@@ -287,12 +298,16 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_create_an_assets_metadata(String asset_guid, boolean locked){
-        // Create new asset with the required minimal information: PID, GUID, STATUS, null PARENT_GUID, a WORKSTATION that is IN_SERVICE, Allocation > 0, Digitiser, Institution and Collection.
+    public WhenAction a_POST_request_is_sent_to_create_an_assets_metadata(String asset_guid, boolean locked) {
+        // Create new asset with the required minimal information: PID, GUID, STATUS,
+        // null PARENT_GUID, a WORKSTATION that is IN_SERVICE, Allocation > 0,
+        // Digitiser, Institution and Collection.
 
         getToken();
 
-        String body = "{\"asset_pid\":\"test-suite-asset-pid\", \"asset_guid\":\"" + asset_guid + "\", \"status\":\"WORKING_COPY\", \"institution\":\"test-suite-institution\", \"collection\":\"test-suite-collection\", \"pipeline\":\"test-suite-pipeline\", \"workstation\": \"test-suite-workstation\", \"digitiser\":\"test-suite\", \"asset_locked\": " + locked + " }";
+        String body = "{\"asset_pid\":\"test-suite-asset-pid\", \"asset_guid\":\"" + asset_guid
+                + "\", \"status\":\"WORKING_COPY\", \"institution\":\"test-suite-institution\", \"collection\":\"test-suite-collection\", \"pipeline\":\"test-suite-pipeline\", \"workstation\": \"test-suite-workstation\", \"digitiser\":\"test-suite\", \"asset_locked\": "
+                + locked + " }";
 
         request = HttpRequest.newBuilder()
                 .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/?allocation_mb=10"))
@@ -306,7 +321,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_based_on_model_data_to_create_an_assets_metadata(Metadata model){
+    public WhenAction a_POST_request_is_sent_based_on_model_data_to_create_an_assets_metadata(Metadata model) {
         // Create a new asset based on model data
 
         getToken();
@@ -315,8 +330,7 @@ public class WhenAction extends Stage<WhenAction> {
         String body;
         try {
             body = mapper.writeValueAsString(model);
-        } 
-        catch (JsonProcessingException e) {
+        } catch (JsonProcessingException e) {
             e.printStackTrace();
             body = "{}";
         }
@@ -333,12 +347,18 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_create_an_assets_metadata_different_institutions(String asset_guid, boolean locked, String institution, String collection, String pipeline, String workstation){
-        // Create new asset with the required minimal information: PID, GUID, STATUS, null PARENT_GUID, a WORKSTATION that is IN_SERVICE, Allocation > 0, Digitiser, Institution and Collection.
+    public WhenAction a_POST_request_is_sent_to_create_an_assets_metadata_different_institutions(String asset_guid,
+            boolean locked, String institution, String collection, String pipeline, String workstation) {
+        // Create new asset with the required minimal information: PID, GUID, STATUS,
+        // null PARENT_GUID, a WORKSTATION that is IN_SERVICE, Allocation > 0,
+        // Digitiser, Institution and Collection.
 
         getToken();
 
-        String body = "{\"asset_pid\":\"test-suite-asset-pid\", \"asset_guid\":\"" + asset_guid + "\", \"status\":\"WORKING_COPY\", \"institution\":\"" + institution + "\", \"collection\":\"" + collection + "\", \"pipeline\":\"" + pipeline + "\", \"workstation\": \"" + workstation + "\", \"digitiser\":\"test-suite\", \"asset_locked\": " + locked + " }";
+        String body = "{\"asset_pid\":\"test-suite-asset-pid\", \"asset_guid\":\"" + asset_guid
+                + "\", \"status\":\"WORKING_COPY\", \"institution\":\"" + institution + "\", \"collection\":\""
+                + collection + "\", \"pipeline\":\"" + pipeline + "\", \"workstation\": \"" + workstation
+                + "\", \"digitiser\":\"test-suite\", \"asset_locked\": " + locked + " }";
 
         request = HttpRequest.newBuilder()
                 .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/?allocation_mb=10"))
@@ -352,11 +372,16 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_fail_the_creation_of_an_asset_metadata(String asset_pid, String asset_guid, String status, String institution, String collection, String pipeline, String workstation, int allocation){
+    public WhenAction a_POST_request_is_sent_to_fail_the_creation_of_an_asset_metadata(String asset_pid,
+            String asset_guid, String status, String institution, String collection, String pipeline,
+            String workstation, int allocation) {
 
         getToken();
 
-        String body = "{\"asset_pid\":\"" + asset_pid + "\", \"asset_guid\":\"" + asset_guid + "\", \"status\":\"" + status + "\", \"institution\":\"" + institution + "\", \"collection\":\"" + collection + "\", \"pipeline\":\"" + pipeline + "\", \"workstation\":\"" + workstation + "\", \"digitiser\":\"test-suite\" }";
+        String body = "{\"asset_pid\":\"" + asset_pid + "\", \"asset_guid\":\"" + asset_guid + "\", \"status\":\""
+                + status + "\", \"institution\":\"" + institution + "\", \"collection\":\"" + collection
+                + "\", \"pipeline\":\"" + pipeline + "\", \"workstation\":\"" + workstation
+                + "\", \"digitiser\":\"test-suite\" }";
 
         request = HttpRequest.newBuilder()
                 .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/?allocation_mb=" + allocation))
@@ -370,7 +395,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_GET_request_is_sent_to_get_an_asset(String assetGuid){
+    public WhenAction a_GET_request_is_sent_to_get_an_asset(String assetGuid) {
 
         getToken();
 
@@ -386,7 +411,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_GET_request_is_sent_to_fail_the_retrieval_of_an_asset(String asset_guid){
+    public WhenAction a_GET_request_is_sent_to_fail_the_retrieval_of_an_asset(String asset_guid) {
 
         getToken();
 
@@ -402,10 +427,12 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_PUT_request_is_sent_to_update_an_asset(){
+    public WhenAction a_PUT_request_is_sent_to_update_an_asset() {
 
-        // Minimum information for updating is: institution, workstation, pipeline, collection, status and update user.
-        // Then the Update field. We are testing if "funding" changes value (original = null, updated = ["50000 kroner"])
+        // Minimum information for updating is: institution, workstation, pipeline,
+        // collection, status and update user.
+        // Then the Update field. We are testing if "funding" changes value (original =
+        // null, updated = ["50000 kroner"])
         String body = "{\"asset_guid\":\"test-suite-asset-updated\", \"institution\":\"test-suite-institution\", \"workstation\":\"test-suite-workstation\", \"pipeline\":\"test-suite-pipeline\", \"collection\":\"test-suite-collection\", \"status\":\"WORKING_COPY\", \"updateUser\":\"test-suite\", \"funding\":[\"50000 kroner\"], \"asset_locked\": true }";
 
         getToken();
@@ -422,9 +449,14 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_PUT_request_is_sent_to_fail_the_update_an_asset(String asset_guid, String institution, String workstation, String pipeline, String collection, String status, String updateUser, boolean asset_locked){
+    public WhenAction a_PUT_request_is_sent_to_fail_the_update_an_asset(String asset_guid, String institution,
+            String workstation, String pipeline, String collection, String status, String updateUser,
+            boolean asset_locked) {
 
-        String body = "{\"asset_guid\":\"" + asset_guid + "\", \"institution\":\"" + institution + "\", \"workstation\":\"" + workstation + "\", \"pipeline\":\"" + pipeline + "\", \"collection\":\"" + collection + "\", \"status\":\"" + status + "\", \"updateUser\":\"" + updateUser + "\", \"asset_locked\":" + asset_locked  + "}";
+        String body = "{\"asset_guid\":\"" + asset_guid + "\", \"institution\":\"" + institution
+                + "\", \"workstation\":\"" + workstation + "\", \"pipeline\":\"" + pipeline + "\", \"collection\":\""
+                + collection + "\", \"status\":\"" + status + "\", \"updateUser\":\"" + updateUser
+                + "\", \"asset_locked\":" + asset_locked + "}";
 
         getToken();
 
@@ -440,7 +472,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_DELETE_request_is_sent_to_delete_an_asset(){
+    public WhenAction a_DELETE_request_is_sent_to_delete_an_asset() {
 
         getToken();
 
@@ -455,7 +487,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_DELETE_request_is_sent_to_delete_an_assets_metadata(String asset_guid){
+    public WhenAction a_DELETE_request_is_sent_to_delete_an_assets_metadata(String asset_guid) {
 
         getToken();
 
@@ -464,13 +496,13 @@ public class WhenAction extends Stage<WhenAction> {
                 .header("Authorization", "Bearer " + token)
                 .DELETE()
                 .build();
-        
+
         makeApiCall(request);
 
         return self();
     }
 
-    public WhenAction a_DELETE_request_is_sent_to_fail_the_deletion_of_an_asset(String asset_guid){
+    public WhenAction a_DELETE_request_is_sent_to_fail_the_deletion_of_an_asset(String asset_guid) {
 
         getToken();
 
@@ -485,7 +517,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_receive_an_asset(){
+    public WhenAction a_POST_request_is_sent_to_receive_an_asset() {
         // ShareName and a MinimalAsset {asset_guid}
         String body = "{\"shareName\": \"test-suite-share-name\", \"minimalAsset\": { \"asset_guid\": \"test-suite-asset-received\" } }";
 
@@ -503,7 +535,8 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_fail_to_receive_an_asset(boolean share, String shareName, boolean minimalAsset){
+    public WhenAction a_POST_request_is_sent_to_fail_to_receive_an_asset(boolean share, String shareName,
+            boolean minimalAsset) {
 
         String body = "";
         getToken();
@@ -513,7 +546,7 @@ public class WhenAction extends Stage<WhenAction> {
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token);
 
-        if(share){
+        if (share) {
             body = "{ \"shareName\": \"" + shareName + "\" }";
             if (minimalAsset) {
                 body = "{ \"shareName\": \"" + shareName + "\", { \"minimalAsset\": { \"asset_guid\": \"\" } }";
@@ -531,7 +564,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_audit_an_asset(){
+    public WhenAction a_POST_request_is_sent_to_audit_an_asset() {
 
         String body = "{\"user\": \"test-suite-auditer\" }";
 
@@ -549,11 +582,11 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_fail_to_audit_an_asset(boolean digitiser){
+    public WhenAction a_POST_request_is_sent_to_fail_to_audit_an_asset(boolean digitiser) {
 
         String body = "";
 
-        if (digitiser){
+        if (digitiser) {
             body = "{\"user\": \"test-suite\" }";
         } else {
             body = "{\"user\" : null }";
@@ -573,9 +606,10 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_complete_an_asset(String asset_guid){
+    public WhenAction a_POST_request_is_sent_to_complete_an_asset(String asset_guid) {
 
-        String body = "{\"shareName\": \"test-suite-share-name\", \"minimalAsset\": { \"asset_guid\": \"" + asset_guid + "\" } }";
+        String body = "{\"shareName\": \"test-suite-share-name\", \"minimalAsset\": { \"asset_guid\": \"" + asset_guid
+                + "\" } }";
 
         getToken();
 
@@ -591,7 +625,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_fail_to_complete_an_asset(){
+    public WhenAction a_POST_request_is_sent_to_fail_to_complete_an_asset() {
 
         String body = "{\"shareName\": \"test-suite-share-name\", \"minimalAsset\": { \"asset_guid\": null } }";
 
@@ -609,7 +643,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_GET_request_is_sent_to_return_asset_events(){
+    public WhenAction a_GET_request_is_sent_to_return_asset_events() {
 
         getToken();
 
@@ -626,7 +660,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_GET_request_is_sent_to_fail_to_return_asset_events(String asset_guid){
+    public WhenAction a_GET_request_is_sent_to_fail_to_return_asset_events(String asset_guid) {
 
         getToken();
 
@@ -643,12 +677,14 @@ public class WhenAction extends Stage<WhenAction> {
 
     }
 
-    public WhenAction a_PUT_request_is_sent_to_manually_edit_an_assets_status(String asset_guid, String newStatus, String errorMessage){
+    public WhenAction a_PUT_request_is_sent_to_manually_edit_an_assets_status(String asset_guid, String newStatus,
+            String errorMessage) {
 
         getToken();
 
         request = HttpRequest.newBuilder()
-                .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/" + asset_guid + "/setstatus/?newStatus=" + newStatus + "&errorMessage=" + errorMessage))
+                .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/" + asset_guid + "/setstatus/?newStatus="
+                        + newStatus + "&errorMessage=" + errorMessage))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
                 .PUT(HttpRequest.BodyPublishers.noBody())
@@ -659,12 +695,13 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_PUT_request_is_sent_to_fail_to_set_an_asset_status(String asset_guid, String newStatus){
+    public WhenAction a_PUT_request_is_sent_to_fail_to_set_an_asset_status(String asset_guid, String newStatus) {
 
         getToken();
 
         request = HttpRequest.newBuilder()
-                .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/" + asset_guid + "/setstatus/?newStatus=" + newStatus + "&errorMessage="))
+                .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/" + asset_guid + "/setstatus/?newStatus="
+                        + newStatus + "&errorMessage="))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
                 .PUT(HttpRequest.BodyPublishers.noBody())
@@ -675,23 +712,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_PUT_request_is_sent_to_unlock_an_asset(String asset_guid){
-
-        getToken();
-
-        request = HttpRequest.newBuilder()
-                .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/" + asset_guid + "/unlock"))
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + token)
-                .PUT(HttpRequest.BodyPublishers.noBody())
-                .build();
-
-        makeApiCall(request);
-
-        return self();
-    }
-
-    public WhenAction a_PUT_request_is_sent_to_fail_to_unlock_an_asset(String asset_guid){
+    public WhenAction a_PUT_request_is_sent_to_unlock_an_asset(String asset_guid) {
 
         getToken();
 
@@ -707,14 +728,30 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_PUT_request_is_sent_to_bulk_update_assets(List<String> assetGuids){
+    public WhenAction a_PUT_request_is_sent_to_fail_to_unlock_an_asset(String asset_guid) {
+
+        getToken();
+
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/" + asset_guid + "/unlock"))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .PUT(HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        makeApiCall(request);
+
+        return self();
+    }
+
+    public WhenAction a_PUT_request_is_sent_to_bulk_update_assets(List<String> assetGuids) {
         getToken();
 
         StringBuilder queryString = new StringBuilder();
 
-        for (int i = 0; i < assetGuids.size(); i++){
+        for (int i = 0; i < assetGuids.size(); i++) {
             queryString.append("assets=").append(assetGuids.get(i));
-            if (i < assetGuids.size() - 1){
+            if (i < assetGuids.size() - 1) {
                 queryString.append("&");
             }
         }
@@ -733,23 +770,25 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_PUT_request_is_sent_to_fail_bulk_update_assets(List<String> assetGuids, boolean body, boolean updateUser, boolean ownParent, boolean parentDoesntExist, boolean locked){
+    public WhenAction a_PUT_request_is_sent_to_fail_bulk_update_assets(List<String> assetGuids, boolean body,
+            boolean updateUser, boolean ownParent, boolean parentDoesntExist, boolean locked) {
 
         getToken();
 
         StringBuilder queryString = new StringBuilder();
 
-        for (int i = 0; i < assetGuids.size(); i++){
+        for (int i = 0; i < assetGuids.size(); i++) {
             queryString.append("assets=").append(assetGuids.get(i));
-            if (i < assetGuids.size() - 1){
+            if (i < assetGuids.size() - 1) {
                 queryString.append("&");
             }
         }
 
-        if (body){
-            if (updateUser){
-                if (!locked){
-                    String bodyObject = "{\"institution\":\"test-suite-institution\", \"workstation\":\"test-suite-workstation\", \"pipeline\":\"test-suite-pipeline\", \"collection\":\"test-suite-collection\", \"updateUser\": \"test-suite\", \"status\":\"WORKING_COPY\", \"funding\":\"50000 kroner\", \"asset_locked\": " + locked + " }";
+        if (body) {
+            if (updateUser) {
+                if (!locked) {
+                    String bodyObject = "{\"institution\":\"test-suite-institution\", \"workstation\":\"test-suite-workstation\", \"pipeline\":\"test-suite-pipeline\", \"collection\":\"test-suite-collection\", \"updateUser\": \"test-suite\", \"status\":\"WORKING_COPY\", \"funding\":\"50000 kroner\", \"asset_locked\": "
+                            + locked + " }";
 
                     request = HttpRequest.newBuilder()
                             .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/bulkUpdate?" + queryString))
@@ -758,8 +797,9 @@ public class WhenAction extends Stage<WhenAction> {
                             .PUT(HttpRequest.BodyPublishers.ofString(bodyObject))
                             .build();
                 } else {
-                    if (assetGuids.isEmpty()){
-                        String bodyObject = "{\"institution\":\"test-suite-institution\", \"workstation\":\"test-suite-workstation\", \"pipeline\":\"test-suite-pipeline\", \"collection\":\"test-suite-collection\", \"updateUser\": \"test-suite\", \"status\":\"WORKING_COPY\", \"funding\":\"50000 kroner\", \"asset_locked\": " + locked + " }";
+                    if (assetGuids.isEmpty()) {
+                        String bodyObject = "{\"institution\":\"test-suite-institution\", \"workstation\":\"test-suite-workstation\", \"pipeline\":\"test-suite-pipeline\", \"collection\":\"test-suite-collection\", \"updateUser\": \"test-suite\", \"status\":\"WORKING_COPY\", \"funding\":\"50000 kroner\", \"asset_locked\": "
+                                + locked + " }";
 
                         request = HttpRequest.newBuilder()
                                 .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/bulkUpdate"))
@@ -769,8 +809,9 @@ public class WhenAction extends Stage<WhenAction> {
                                 .build();
                     }
 
-                    if (assetGuids.size() == 2){
-                        String bodyObject = "{\"institution\":\"test-suite-institution\", \"workstation\":\"test-suite-workstation\", \"pipeline\":\"test-suite-pipeline\", \"collection\":\"test-suite-collection\", \"updateUser\": \"test-suite\", \"status\":\"WORKING_COPY\", \"funding\":\"50000 kroner\", \"asset_locked\": " + locked + " }";
+                    if (assetGuids.size() == 2) {
+                        String bodyObject = "{\"institution\":\"test-suite-institution\", \"workstation\":\"test-suite-workstation\", \"pipeline\":\"test-suite-pipeline\", \"collection\":\"test-suite-collection\", \"updateUser\": \"test-suite\", \"status\":\"WORKING_COPY\", \"funding\":\"50000 kroner\", \"asset_locked\": "
+                                + locked + " }";
 
                         request = HttpRequest.newBuilder()
                                 .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/bulkUpdate?" + queryString))
@@ -780,8 +821,9 @@ public class WhenAction extends Stage<WhenAction> {
                                 .build();
                     }
 
-                    if (ownParent){
-                        String bodyObject = "{\"institution\":\"test-suite-institution\", \"workstation\":\"test-suite-workstation\", \"pipeline\":\"test-suite-pipeline\", \"collection\":\"test-suite-collection\", \"updateUser\": \"test-suite\", \"status\":\"WORKING_COPY\", \"funding\":\"50000 kroner\", \"parent_guid\": \"" + assetGuids.get(0) + "\", \"asset_locked\": " + locked + "}";
+                    if (ownParent) {
+                        String bodyObject = "{\"institution\":\"test-suite-institution\", \"workstation\":\"test-suite-workstation\", \"pipeline\":\"test-suite-pipeline\", \"collection\":\"test-suite-collection\", \"updateUser\": \"test-suite\", \"status\":\"WORKING_COPY\", \"funding\":\"50000 kroner\", \"parent_guid\": \""
+                                + assetGuids.get(0) + "\", \"asset_locked\": " + locked + "}";
                         request = HttpRequest.newBuilder()
                                 .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/bulkUpdate?" + queryString))
                                 .header("Content-Type", "application/json")
@@ -790,8 +832,9 @@ public class WhenAction extends Stage<WhenAction> {
                                 .build();
                     }
 
-                    if (parentDoesntExist){
-                        String bodyObject = "{\"institution\":\"test-suite-institution\", \"workstation\":\"test-suite-workstation\", \"pipeline\":\"test-suite-pipeline\", \"collection\":\"test-suite-collection\", \"updateUser\": \"test-suite\", \"status\":\"WORKING_COPY\", \"funding\":\"50000 kroner\", \"parent_guid\": \"parent-non-existent\", \"asset_locked\": " + locked + "}";
+                    if (parentDoesntExist) {
+                        String bodyObject = "{\"institution\":\"test-suite-institution\", \"workstation\":\"test-suite-workstation\", \"pipeline\":\"test-suite-pipeline\", \"collection\":\"test-suite-collection\", \"updateUser\": \"test-suite\", \"status\":\"WORKING_COPY\", \"funding\":\"50000 kroner\", \"parent_guid\": \"parent-non-existent\", \"asset_locked\": "
+                                + locked + "}";
 
                         request = HttpRequest.newBuilder()
                                 .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/bulkUpdate?" + queryString))
@@ -803,7 +846,8 @@ public class WhenAction extends Stage<WhenAction> {
                 }
 
             } else {
-                String bodyObject = "{\"institution\":\"test-suite-institution\", \"workstation\":\"test-suite-workstation\", \"pipeline\":\"test-suite-pipeline\", \"collection\":\"test-suite-collection\", \"status\":\"WORKING_COPY\", \"funding\":\"50000 kroner\", \"asset_locked\": " + locked + " }";
+                String bodyObject = "{\"institution\":\"test-suite-institution\", \"workstation\":\"test-suite-workstation\", \"pipeline\":\"test-suite-pipeline\", \"collection\":\"test-suite-collection\", \"status\":\"WORKING_COPY\", \"funding\":\"50000 kroner\", \"asset_locked\": "
+                        + locked + " }";
 
                 request = HttpRequest.newBuilder()
                         .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/bulkUpdate?" + queryString))
@@ -826,7 +870,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_GET_request_is_sent_to_get_assets(){
+    public WhenAction a_GET_request_is_sent_to_get_assets() {
 
         getToken();
 
@@ -841,7 +885,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_GET_request_is_sent_to_get_an_assets_status(String asset_guid){
+    public WhenAction a_GET_request_is_sent_to_get_an_assets_status(String asset_guid) {
 
         getToken();
 
@@ -852,33 +896,34 @@ public class WhenAction extends Stage<WhenAction> {
                 .build();
         try {
             makeApiCall(request);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_create_an_asset_group(String group_name, List<String> assets, boolean hasAccess){
+    public WhenAction a_POST_request_is_sent_to_create_an_asset_group(String group_name, List<String> assets,
+            boolean hasAccess) {
 
         getToken();
 
         StringBuilder stringAssets = new StringBuilder();
-        for (int i = 0; i <= assets.size() - 1; i++){
+        for (int i = 0; i <= assets.size() - 1; i++) {
             stringAssets.append("\"").append(assets.get(i)).append("\"");
-            if (i < assets.size() - 1){
+            if (i < assets.size() - 1) {
                 stringAssets.append(",");
             }
         }
 
         String body = "";
 
-        if (!hasAccess){
+        if (!hasAccess) {
             body = "{\"group_name\": \"" + group_name + "\", \"assets\": [" + stringAssets + "], \"hasAccess\": [] }";
         } else {
-            body = "{\"group_name\": \"" + group_name + "\", \"assets\": [" + stringAssets + "], \"hasAccess\": [ \"service-account-test-suite-read-role-1\" ] }";
+            body = "{\"group_name\": \"" + group_name + "\", \"assets\": [" + stringAssets
+                    + "], \"hasAccess\": [ \"service-account-test-suite-read-role-1\" ] }";
         }
-
 
         request = HttpRequest.newBuilder()
                 .uri(URI.create(assetServiceUrl + "/v1/assetgroups/createassetgroup"))
@@ -892,27 +937,28 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_create_an_asset_group_read_role_1(String group_name, List<String> assets, boolean hasAccess){
+    public WhenAction a_POST_request_is_sent_to_create_an_asset_group_read_role_1(String group_name,
+            List<String> assets, boolean hasAccess) {
 
         getReadRole1Token();
 
         StringBuilder stringAssets = new StringBuilder();
-        for (int i = 0; i <= assets.size() - 1; i++){
+        for (int i = 0; i <= assets.size() - 1; i++) {
             stringAssets.append("\"").append(assets.get(i)).append("\"");
-            if (i < assets.size() - 1){
+            if (i < assets.size() - 1) {
                 stringAssets.append(",");
             }
         }
 
         String body = "";
 
-        if (hasAccess){
-            body = "{\"group_name\": \"" + group_name + "\", \"assets\": [" + stringAssets + "], \"hasAccess\": [ \"test-user\" ] }";
+        if (hasAccess) {
+            body = "{\"group_name\": \"" + group_name + "\", \"assets\": [" + stringAssets
+                    + "], \"hasAccess\": [ \"test-user\" ] }";
         } else {
             body = "{\"group_name\": \"" + group_name + "\", \"assets\": [" + stringAssets + "], \"hasAccess\": [] }";
         }
 
-
         request = HttpRequest.newBuilder()
                 .uri(URI.create(assetServiceUrl + "/v1/assetgroups/createassetgroup"))
                 .header("Content-Type", "application/json")
@@ -925,19 +971,21 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_create_an_asset_group_write_role_1(String group_name, List<String> assets){
+    public WhenAction a_POST_request_is_sent_to_create_an_asset_group_write_role_1(String group_name,
+            List<String> assets) {
 
         getWriteRole1Token();
 
         StringBuilder stringAssets = new StringBuilder();
-        for (int i = 0; i <= assets.size() - 1; i++){
+        for (int i = 0; i <= assets.size() - 1; i++) {
             stringAssets.append("\"").append(assets.get(i)).append("\"");
-            if (i < assets.size() - 1){
+            if (i < assets.size() - 1) {
                 stringAssets.append(",");
             }
         }
 
-        String body = "{\"group_name\": \"" + group_name + "\", \"assets\": [" + stringAssets + "], \"hasAccess\": [ \"test-suite\" ] }";
+        String body = "{\"group_name\": \"" + group_name + "\", \"assets\": [" + stringAssets
+                + "], \"hasAccess\": [ \"test-suite\" ] }";
 
         request = HttpRequest.newBuilder()
                 .uri(URI.create(assetServiceUrl + "/v1/assetgroups/createassetgroup"))
@@ -951,28 +999,30 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_fail_the_creation_of_an_asset_group(String group_name, List<String> assets, List<String> hasAccess, boolean body){
+    public WhenAction a_POST_request_is_sent_to_fail_the_creation_of_an_asset_group(String group_name,
+            List<String> assets, List<String> hasAccess, boolean body) {
 
         getToken();
 
-        if (body){
+        if (body) {
             StringBuilder stringAssets = new StringBuilder();
-            for (int i = 0; i <= assets.size() - 1; i++){
+            for (int i = 0; i <= assets.size() - 1; i++) {
                 stringAssets.append("\"").append(assets.get(i)).append("\"");
-                if (i < assets.size() - 1){
+                if (i < assets.size() - 1) {
                     stringAssets.append(",");
                 }
             }
 
             StringBuilder stringAccess = new StringBuilder();
-            for (int i = 0; i <= hasAccess.size() - 1; i++){
+            for (int i = 0; i <= hasAccess.size() - 1; i++) {
                 stringAccess.append("\"").append(hasAccess.get(i)).append("\"");
-                if (i < assets.size() - 1){
+                if (i < assets.size() - 1) {
                     stringAssets.append(",");
                 }
             }
 
-            String bodyString = "{\"group_name\": \"" + group_name + "\", \"assets\": [" + stringAssets + "], \"hasAccess\": [" + stringAccess + "]}";
+            String bodyString = "{\"group_name\": \"" + group_name + "\", \"assets\": [" + stringAssets
+                    + "], \"hasAccess\": [" + stringAccess + "]}";
 
             request = HttpRequest.newBuilder()
                     .uri(URI.create(assetServiceUrl + "/v1/assetgroups/createassetgroup"))
@@ -994,18 +1044,19 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_PUT_request_is_sent_to_grant_access_to_asset_group_service_user(String groupName, List<String> users, boolean body){
+    public WhenAction a_PUT_request_is_sent_to_grant_access_to_asset_group_service_user(String groupName,
+            List<String> users, boolean body) {
 
         getToken();
 
         StringBuilder stringUsers = new StringBuilder();
-        for (int i = 0; i <= users.size() - 1; i++){
+        for (int i = 0; i <= users.size() - 1; i++) {
             stringUsers.append("\"").append(users.get(i)).append("\"");
-            if (i < users.size() - 1){
+            if (i < users.size() - 1) {
                 stringUsers.append(",");
             }
         }
-        if (body){
+        if (body) {
             String bodyString = "[" + stringUsers + "]";
 
             request = HttpRequest.newBuilder()
@@ -1028,14 +1079,15 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_PUT_request_is_sent_to_grant_access_to_asset_group_read_role_1(String groupName, List<String> users){
+    public WhenAction a_PUT_request_is_sent_to_grant_access_to_asset_group_read_role_1(String groupName,
+            List<String> users) {
 
         getReadRole1Token();
 
         StringBuilder stringUsers = new StringBuilder();
-        for (int i = 0; i <= users.size() - 1; i++){
+        for (int i = 0; i <= users.size() - 1; i++) {
             stringUsers.append("\"").append(users.get(i)).append("\"");
-            if (i < users.size() - 1){
+            if (i < users.size() - 1) {
                 stringUsers.append(",");
             }
         }
@@ -1054,14 +1106,15 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_PUT_request_is_sent_to_grant_access_to_asset_group_write_role_1(String groupName, List<String> users){
+    public WhenAction a_PUT_request_is_sent_to_grant_access_to_asset_group_write_role_1(String groupName,
+            List<String> users) {
 
         getWriteRole1Token();
 
         StringBuilder stringUsers = new StringBuilder();
-        for (int i = 0; i <= users.size() - 1; i++){
+        for (int i = 0; i <= users.size() - 1; i++) {
             stringUsers.append("\"").append(users.get(i)).append("\"");
-            if (i < users.size() - 1){
+            if (i < users.size() - 1) {
                 stringUsers.append(",");
             }
         }
@@ -1080,18 +1133,19 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_PUT_request_is_sent_to_revoke_access_to_asset_group_service_user(String groupName, List<String> users, boolean body){
+    public WhenAction a_PUT_request_is_sent_to_revoke_access_to_asset_group_service_user(String groupName,
+            List<String> users, boolean body) {
 
         getToken();
 
         StringBuilder stringUsers = new StringBuilder();
-        for (int i = 0; i <= users.size() - 1; i++){
+        for (int i = 0; i <= users.size() - 1; i++) {
             stringUsers.append("\"").append(users.get(i)).append("\"");
-            if (i < users.size() - 1){
+            if (i < users.size() - 1) {
                 stringUsers.append(",");
             }
         }
-        if (body){
+        if (body) {
             String bodyString = "[" + stringUsers + "]";
 
             request = HttpRequest.newBuilder()
@@ -1114,14 +1168,15 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_PUT_request_is_sent_to_revoke_access_to_asset_group_write_role_1(String groupName, List<String> users){
+    public WhenAction a_PUT_request_is_sent_to_revoke_access_to_asset_group_write_role_1(String groupName,
+            List<String> users) {
 
         getWriteRole1Token();
 
         StringBuilder stringUsers = new StringBuilder();
-        for (int i = 0; i <= users.size() - 1; i++){
+        for (int i = 0; i <= users.size() - 1; i++) {
             stringUsers.append("\"").append(users.get(i)).append("\"");
-            if (i < users.size() - 1){
+            if (i < users.size() - 1) {
                 stringUsers.append(",");
             }
         }
@@ -1129,19 +1184,18 @@ public class WhenAction extends Stage<WhenAction> {
         String bodyString = "[" + stringUsers + "]";
 
         request = HttpRequest.newBuilder()
-                    .uri(URI.create(assetServiceUrl + "/v1/assetgroups/revokeAccess/" + groupName))
-                    .header("Authorization", "Bearer " + token)
-                    .header("Content-Type", "application/json")
-                    .PUT(HttpRequest.BodyPublishers.ofString(bodyString))
-                    .build();
-
+                .uri(URI.create(assetServiceUrl + "/v1/assetgroups/revokeAccess/" + groupName))
+                .header("Authorization", "Bearer " + token)
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(bodyString))
+                .build();
 
         makeApiCall(request);
 
         return self();
     }
 
-    public WhenAction a_GET_request_is_sent_to_read_an_asset_group(String groupName){
+    public WhenAction a_GET_request_is_sent_to_read_an_asset_group(String groupName) {
 
         getToken();
 
@@ -1157,7 +1211,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_DELETE_request_is_sent_to_delete_an_asset_group(String groupName){
+    public WhenAction a_DELETE_request_is_sent_to_delete_an_asset_group(String groupName) {
 
         getToken();
 
@@ -1172,7 +1226,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_DELETE_request_is_sent_to_delete_an_asset_group_write_role_1(String groupName){
+    public WhenAction a_DELETE_request_is_sent_to_delete_an_asset_group_write_role_1(String groupName) {
 
         getWriteRole1Token();
 
@@ -1187,7 +1241,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_DELETE_request_is_sent_to_delete_an_asset_group_read_role_1(String groupName){
+    public WhenAction a_DELETE_request_is_sent_to_delete_an_asset_group_read_role_1(String groupName) {
 
         getReadRole1Token();
 
@@ -1202,18 +1256,19 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_PUT_request_is_sent_to_add_assets_to_asset_group_service_user(String groupName, List<String> assets, boolean body){
+    public WhenAction a_PUT_request_is_sent_to_add_assets_to_asset_group_service_user(String groupName,
+            List<String> assets, boolean body) {
 
         getToken();
 
         StringBuilder stringAssets = new StringBuilder();
-        for (int i = 0; i <= assets.size() - 1; i++){
+        for (int i = 0; i <= assets.size() - 1; i++) {
             stringAssets.append("\"").append(assets.get(i)).append("\"");
-            if (i < assets.size() - 1){
+            if (i < assets.size() - 1) {
                 stringAssets.append(",");
             }
         }
-        if (body){
+        if (body) {
             String bodyString = "[" + stringAssets + "]";
 
             request = HttpRequest.newBuilder()
@@ -1231,20 +1286,20 @@ public class WhenAction extends Stage<WhenAction> {
                     .build();
         }
 
-
         makeApiCall(request);
 
         return self();
     }
 
-    public WhenAction a_PUT_request_is_sent_to_add_assets_to_asset_group_read_role_1(String groupName, List<String> assets){
+    public WhenAction a_PUT_request_is_sent_to_add_assets_to_asset_group_read_role_1(String groupName,
+            List<String> assets) {
 
         getReadRole1Token();
 
         StringBuilder stringAssets = new StringBuilder();
-        for (int i = 0; i <= assets.size() - 1; i++){
+        for (int i = 0; i <= assets.size() - 1; i++) {
             stringAssets.append("\"").append(assets.get(i)).append("\"");
-            if (i < assets.size() - 1){
+            if (i < assets.size() - 1) {
                 stringAssets.append(",");
             }
         }
@@ -1263,14 +1318,15 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_PUT_request_is_sent_to_add_assets_to_asset_group_write_role_1(String groupName, List<String> assets){
+    public WhenAction a_PUT_request_is_sent_to_add_assets_to_asset_group_write_role_1(String groupName,
+            List<String> assets) {
 
         getWriteRole1Token();
 
         StringBuilder stringAssets = new StringBuilder();
-        for (int i = 0; i <= assets.size() - 1; i++){
+        for (int i = 0; i <= assets.size() - 1; i++) {
             stringAssets.append("\"").append(assets.get(i)).append("\"");
-            if (i < assets.size() - 1){
+            if (i < assets.size() - 1) {
                 stringAssets.append(",");
             }
         }
@@ -1289,19 +1345,20 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_PUT_request_is_sent_to_remove_assets_from_asset_group_service_user(String groupName, List<String> assets, boolean body){
+    public WhenAction a_PUT_request_is_sent_to_remove_assets_from_asset_group_service_user(String groupName,
+            List<String> assets, boolean body) {
 
         getToken();
 
         StringBuilder stringAssets = new StringBuilder();
-        for (int i = 0; i <= assets.size() - 1; i++){
+        for (int i = 0; i <= assets.size() - 1; i++) {
             stringAssets.append("\"").append(assets.get(i)).append("\"");
-            if (i < assets.size() - 1){
+            if (i < assets.size() - 1) {
                 stringAssets.append(",");
             }
         }
 
-        if (body){
+        if (body) {
             String bodyString = "[" + stringAssets + "]";
 
             request = HttpRequest.newBuilder()
@@ -1319,21 +1376,20 @@ public class WhenAction extends Stage<WhenAction> {
                     .build();
         }
 
-
-
         makeApiCall(request);
 
         return self();
     }
 
-    public WhenAction a_PUT_request_is_sent_to_remove_assets_from_asset_group_read_role_1(String groupName, List<String> assets){
+    public WhenAction a_PUT_request_is_sent_to_remove_assets_from_asset_group_read_role_1(String groupName,
+            List<String> assets) {
 
         getReadRole1Token();
 
         StringBuilder stringAssets = new StringBuilder();
-        for (int i = 0; i <= assets.size() - 1; i++){
+        for (int i = 0; i <= assets.size() - 1; i++) {
             stringAssets.append("\"").append(assets.get(i)).append("\"");
-            if (i < assets.size() - 1){
+            if (i < assets.size() - 1) {
                 stringAssets.append(",");
             }
         }
@@ -1352,14 +1408,15 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_PUT_request_is_sent_to_remove_assets_from_asset_group_write_role_1(String groupName, List<String> assets){
+    public WhenAction a_PUT_request_is_sent_to_remove_assets_from_asset_group_write_role_1(String groupName,
+            List<String> assets) {
 
         getWriteRole1Token();
 
         StringBuilder stringAssets = new StringBuilder();
-        for (int i = 0; i <= assets.size() - 1; i++){
+        for (int i = 0; i <= assets.size() - 1; i++) {
             stringAssets.append("\"").append(assets.get(i)).append("\"");
-            if (i < assets.size() - 1){
+            if (i < assets.size() - 1) {
                 stringAssets.append(",");
             }
         }
@@ -1379,7 +1436,7 @@ public class WhenAction extends Stage<WhenAction> {
     }
 
     // DASSCO-FILE-PROXY ENDPOINTS:
-    public WhenAction a_GET_request_is_sent_to_get_list_of_asset_files_metadata(String asset_guid){
+    public WhenAction a_GET_request_is_sent_to_get_list_of_asset_files_metadata(String asset_guid) {
 
         getToken();
 
@@ -1394,12 +1451,13 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_GET_request_is_sent_to_get_list_of_asset_files(String asset_guid){
+    public WhenAction a_GET_request_is_sent_to_get_list_of_asset_files(String asset_guid) {
 
         getToken();
 
         request = HttpRequest.newBuilder()
-                .uri(URI.create(fileProxyUrl + "/assetfiles/test-suite-institution/test-suite-collection/" + asset_guid))
+                .uri(URI.create(
+                        fileProxyUrl + "/assetfiles/test-suite-institution/test-suite-collection/" + asset_guid))
                 .header("Authorization", "Bearer " + token)
                 .GET()
                 .build();
@@ -1409,12 +1467,13 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_DELETE_request_is_sent_to_delete_all_files_for_an_asset(String asset_guid){
+    public WhenAction a_DELETE_request_is_sent_to_delete_all_files_for_an_asset(String asset_guid) {
 
         getToken();
 
         request = HttpRequest.newBuilder()
-                .uri(URI.create(fileProxyUrl + "/assetfiles/test-suite-institution/test-suite-collection/" + asset_guid))
+                .uri(URI.create(
+                        fileProxyUrl + "/assetfiles/test-suite-institution/test-suite-collection/" + asset_guid))
                 .header("Authorization", "Bearer " + token)
                 .DELETE()
                 .build();
@@ -1424,106 +1483,14 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_DELETE_request_is_sent_to_delete_all_files_for_an_asset(String asset_guid, String institution, String collection){
+    public WhenAction a_DELETE_request_is_sent_to_delete_all_files_for_an_asset(String asset_guid, String institution,
+            String collection) {
 
         getToken();
-        
+
         collection = collection.replaceAll(" ", "%20");
         request = HttpRequest.newBuilder()
-            .uri(URI.create(fileProxyUrl + "/assetfiles/" + institution + "/" + collection + "/" + asset_guid))
-            .header("Authorization", "Bearer " + token)
-            .DELETE()
-            .build();
-
-        makeApiCall(request);
-
-        return self();
-    }
-
-    public WhenAction a_GET_request_is_sent_to_get_a_single_file_from_the_asset(){
-
-        getToken();
-
-        request = HttpRequest.newBuilder()
-                .uri(URI.create(fileProxyUrl + "/assetfiles/test-suite-institution/test-suite-collection/test-suite-asset-created-and-uploaded/cat.png"))
-                .header("Authorization", "Bearer " + token)
-                .GET()
-                .build();
-
-        makeApiCall(request);
-
-        return self();
-    }
-
-    public WhenAction a_GET_request_is_sent_to_fail_to_get_a_single_file_from_the_asset(String institution, String collection, String asset, String file){
-
-        getToken();
-
-        request = HttpRequest.newBuilder()
-                .uri(URI.create(fileProxyUrl + "/assetfiles/" + institution +  "/" + collection + "/" + asset + "/" + file))
-                .header("Authorization", "Bearer " + token)
-                .GET()
-                .build();
-
-        makeApiCall(request);
-
-        return self();
-    }
-
-    public WhenAction a_PUT_request_is_sent_to_upload_a_file(String fileName, String crc, String asset_guid, int allocation){
-
-        getToken();
-
-        String pathToFile = "src/main/resources/static/" + fileName;
-        Path file = Paths.get(pathToFile);
-
-        try {
-            HttpRequest.BodyPublisher bodyPublishers = HttpRequest.BodyPublishers.ofFile(file);
-
-            request = HttpRequest.newBuilder()
-                    .uri(URI.create(fileProxyUrl + "/assetfiles/test-suite-institution/test-suite-collection/" + asset_guid + "/" + fileName + "?crc=" + crc + "&file_size_mb=" + allocation))
-                    .header("Authorization", "Bearer " + token)
-                    .PUT(bodyPublishers)
-                    .build();
-
-            makeApiCall(request);
-
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        return self();
-    }
-
-    public WhenAction a_PUT_request_is_sent_to_upload_a_file_to_NHMD_Vascular_Plants(String fileName, String crc, String asset_guid, int allocation){
-
-        getToken();
-
-        String pathToFile = "src/main/resources/static/" + fileName;
-        Path file = Paths.get(pathToFile);
-
-        try {
-            HttpRequest.BodyPublisher bodyPublishers = HttpRequest.BodyPublishers.ofFile(file);
-
-            request = HttpRequest.newBuilder()
-                    .uri(URI.create(fileProxyUrl + "/assetfiles/NHMD/NHMD%20Vascular%20Plants/" + asset_guid + "/" + fileName + "?crc=" + crc + "&file_size_mb=" + allocation))
-                    .header("Authorization", "Bearer " + token)
-                    .PUT(bodyPublishers)
-                    .build();
-
-            makeApiCall(request);
-
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        return self();
-    }
-
-    public WhenAction a_DELETE_request_is_sent_to_delete_a_single_file_from_the_asset(){
-
-        getToken();
-
-        request = HttpRequest.newBuilder()
-                .uri(URI.create(fileProxyUrl + "/assetfiles/test-suite-institution/test-suite-collection/test-suite-asset-file-to-delete-from-list/cat2.png"))
+                .uri(URI.create(fileProxyUrl + "/assetfiles/" + institution + "/" + collection + "/" + asset_guid))
                 .header("Authorization", "Bearer " + token)
                 .DELETE()
                 .build();
@@ -1533,12 +1500,115 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_DELETE_request_is_sent_to_fail_to_delete_a_single_file_from_the_asset(String file, String asset_guid){
+    public WhenAction a_GET_request_is_sent_to_get_a_single_file_from_the_asset() {
 
         getToken();
 
         request = HttpRequest.newBuilder()
-                .uri(URI.create(fileProxyUrl + "/assetfiles/test-suite-institution/test-suite-collection/" + asset_guid + "/" + file))
+                .uri(URI.create(fileProxyUrl
+                        + "/assetfiles/test-suite-institution/test-suite-collection/test-suite-asset-created-and-uploaded/cat.png"))
+                .header("Authorization", "Bearer " + token)
+                .GET()
+                .build();
+
+        makeApiCall(request);
+
+        return self();
+    }
+
+    public WhenAction a_GET_request_is_sent_to_fail_to_get_a_single_file_from_the_asset(String institution,
+            String collection, String asset, String file) {
+
+        getToken();
+
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(
+                        fileProxyUrl + "/assetfiles/" + institution + "/" + collection + "/" + asset + "/" + file))
+                .header("Authorization", "Bearer " + token)
+                .GET()
+                .build();
+
+        makeApiCall(request);
+
+        return self();
+    }
+
+    public WhenAction a_PUT_request_is_sent_to_upload_a_file(String fileName, String crc, String asset_guid,
+            int allocation) {
+
+        getToken();
+
+        String pathToFile = "src/main/resources/static/" + fileName;
+        Path file = Paths.get(pathToFile);
+
+        try {
+            HttpRequest.BodyPublisher bodyPublishers = HttpRequest.BodyPublishers.ofFile(file);
+
+            request = HttpRequest.newBuilder()
+                    .uri(URI.create(fileProxyUrl + "/assetfiles/test-suite-institution/test-suite-collection/"
+                            + asset_guid + "/" + fileName + "?crc=" + crc + "&file_size_mb=" + allocation))
+                    .header("Authorization", "Bearer " + token)
+                    .PUT(bodyPublishers)
+                    .build();
+
+            makeApiCall(request);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return self();
+    }
+
+    public WhenAction a_PUT_request_is_sent_to_upload_a_file_to_NHMD_Vascular_Plants(String fileName, String crc,
+            String asset_guid, int allocation) {
+
+        getToken();
+
+        String pathToFile = "src/main/resources/static/" + fileName;
+        Path file = Paths.get(pathToFile);
+
+        try {
+            HttpRequest.BodyPublisher bodyPublishers = HttpRequest.BodyPublishers.ofFile(file);
+
+            request = HttpRequest.newBuilder()
+                    .uri(URI.create(fileProxyUrl + "/assetfiles/NHMD/NHMD%20Vascular%20Plants/" + asset_guid + "/"
+                            + fileName + "?crc=" + crc + "&file_size_mb=" + allocation))
+                    .header("Authorization", "Bearer " + token)
+                    .PUT(bodyPublishers)
+                    .build();
+
+            makeApiCall(request);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return self();
+    }
+
+    public WhenAction a_DELETE_request_is_sent_to_delete_a_single_file_from_the_asset() {
+
+        getToken();
+
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(fileProxyUrl
+                        + "/assetfiles/test-suite-institution/test-suite-collection/test-suite-asset-file-to-delete-from-list/cat2.png"))
+                .header("Authorization", "Bearer " + token)
+                .DELETE()
+                .build();
+
+        makeApiCall(request);
+
+        return self();
+    }
+
+    public WhenAction a_DELETE_request_is_sent_to_fail_to_delete_a_single_file_from_the_asset(String file,
+            String asset_guid) {
+
+        getToken();
+
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(fileProxyUrl + "/assetfiles/test-suite-institution/test-suite-collection/" + asset_guid
+                        + "/" + file))
                 .header("Authorization", "Bearer " + token)
                 .DELETE()
                 .build();
@@ -1550,12 +1620,13 @@ public class WhenAction extends Stage<WhenAction> {
 
     public WhenAction a_POST_request_is_sent_to_open_a_share(String asset_guid) throws JSONException {
 
-        String body = "{ \"assets\": [ { \"asset_guid\": \"" + asset_guid + "\", \"institution\": \"test-suite-institution\", \"collection\": \"test-suite-collection\" } ], \"users\": [ \"service-account-test-suite-service-user\" ], \"allocation_mb\": 10 }";
+        String body = "{ \"assets\": [ { \"asset_guid\": \"" + asset_guid
+                + "\", \"institution\": \"test-suite-institution\", \"collection\": \"test-suite-collection\" } ], \"users\": [ \"service-account-test-suite-service-user\" ], \"allocation_mb\": 10 }";
 
         getToken();
 
         request = HttpRequest.newBuilder()
-                .uri(URI.create(fileProxyUrl + "/shares/assets/"+ asset_guid +"/createShare"))
+                .uri(URI.create(fileProxyUrl + "/shares/assets/" + asset_guid + "/createShare"))
                 .header("Authorization", "Bearer " + token)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(body))
@@ -1566,14 +1637,17 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_open_a_share(String asset_guid, String institution, String collection) throws JSONException {
+    public WhenAction a_POST_request_is_sent_to_open_a_share(String asset_guid, String institution, String collection)
+            throws JSONException {
 
-        String body = "{ \"assets\": [ { \"asset_guid\": \"" + asset_guid + "\", \"institution\": \"" + institution + "\", \"collection\": \"" + collection + "\" } ], \"users\": [ \"service-account-test-suite-service-user\" ], \"allocation_mb\": 10 }";
+        String body = "{ \"assets\": [ { \"asset_guid\": \"" + asset_guid + "\", \"institution\": \"" + institution
+                + "\", \"collection\": \"" + collection
+                + "\" } ], \"users\": [ \"service-account-test-suite-service-user\" ], \"allocation_mb\": 10 }";
 
         getToken();
 
         request = HttpRequest.newBuilder()
-                .uri(URI.create(fileProxyUrl + "/shares/assets/"+ asset_guid +"/createShare"))
+                .uri(URI.create(fileProxyUrl + "/shares/assets/" + asset_guid + "/createShare"))
                 .header("Authorization", "Bearer " + token)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(body))
@@ -1584,8 +1658,11 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_fail_to_open_a_share(String asset_guid, String second_asset_guid, int allocation){
-        String body = "{ \"assets\": [ { \"asset_guid\": \"" + asset_guid + "\", \"institution\": \"test-suite-institution\", \"collection\": \"test-suite-collection\" } ], \"users\": [ \"service-account-test-suite-service-user\" ], \"allocation_mb\": " + allocation + " }";
+    public WhenAction a_POST_request_is_sent_to_fail_to_open_a_share(String asset_guid, String second_asset_guid,
+            int allocation) {
+        String body = "{ \"assets\": [ { \"asset_guid\": \"" + asset_guid
+                + "\", \"institution\": \"test-suite-institution\", \"collection\": \"test-suite-collection\" } ], \"users\": [ \"service-account-test-suite-service-user\" ], \"allocation_mb\": "
+                + allocation + " }";
 
         getToken();
 
@@ -1602,9 +1679,9 @@ public class WhenAction extends Stage<WhenAction> {
 
     }
 
-    public WhenAction a_POST_request_is_sent_to_change_allocation_of_a_share(){
+    public WhenAction a_POST_request_is_sent_to_change_allocation_of_a_share() {
 
-        String body = "{ \"asset_guid\": \""+ mainAsset +"\", \"new_allocation_mb\": 10 }";
+        String body = "{ \"asset_guid\": \"" + mainAsset + "\", \"new_allocation_mb\": 10 }";
 
         getToken();
 
@@ -1620,7 +1697,8 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_fail_to_change_allocation_of_a_share(int allocation, String asset_guid){
+    public WhenAction a_POST_request_is_sent_to_fail_to_change_allocation_of_a_share(int allocation,
+            String asset_guid) {
 
         String body = "{ \"asset_guid\": \"" + asset_guid + "\", \"new_allocation_mb\": " + allocation + " }";
 
@@ -1638,7 +1716,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_DELETE_request_is_sent_to_delete_a_share(String asset_guid){
+    public WhenAction a_DELETE_request_is_sent_to_delete_a_share(String asset_guid) {
 
         getToken();
 
@@ -1654,7 +1732,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_DELETE_request_is_sent_to_fail_delete_a_share(String asset_guid){
+    public WhenAction a_DELETE_request_is_sent_to_fail_delete_a_share(String asset_guid) {
 
         getToken();
 
@@ -1670,12 +1748,13 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_synchronize_with_erda(String assetGuid){
+    public WhenAction a_POST_request_is_sent_to_synchronize_with_erda(String assetGuid) {
 
         getToken();
 
         request = HttpRequest.newBuilder()
-                .uri(URI.create(fileProxyUrl + "/shares/assets/" + assetGuid + "/synchronize?workstation=test-suite-workstation&pipeline=test-suite-pipeline"))
+                .uri(URI.create(fileProxyUrl + "/shares/assets/" + assetGuid
+                        + "/synchronize?workstation=test-suite-workstation&pipeline=test-suite-pipeline"))
                 .header("Authorization", "Bearer " + token)
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .build();
@@ -1685,11 +1764,13 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_POST_request_is_sent_to_fail_to_synchronize_with_erda(String asset_guid, String workstation, String pipeline){
+    public WhenAction a_POST_request_is_sent_to_fail_to_synchronize_with_erda(String asset_guid, String workstation,
+            String pipeline) {
         getToken();
 
         request = HttpRequest.newBuilder()
-                .uri(URI.create(fileProxyUrl + "/shares/assets/"+ asset_guid + "/synchronize?workstation=" + workstation + "&pipeline=" + pipeline))
+                .uri(URI.create(fileProxyUrl + "/shares/assets/" + asset_guid + "/synchronize?workstation="
+                        + workstation + "&pipeline=" + pipeline))
                 .header("Authorization", "Bearer " + token)
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .build();
@@ -1739,7 +1820,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_GET_request_is_sent_to_get_a_temp_file(String fileName){
+    public WhenAction a_GET_request_is_sent_to_get_a_temp_file(String fileName) {
 
         getToken();
 
@@ -1754,11 +1835,13 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_DELETE_request_is_sent_to_delete_local_files(String institution, String collection, String assetGuid, String file){
+    public WhenAction a_DELETE_request_is_sent_to_delete_local_files(String institution, String collection,
+            String assetGuid, String file) {
         getToken();
 
         request = HttpRequest.newBuilder()
-                .uri(URI.create(fileProxyUrl + "/assetfiles/deleteLocalFiles/" + institution + "/" + collection + "/" + assetGuid + "/" + file))
+                .uri(URI.create(fileProxyUrl + "/assetfiles/deleteLocalFiles/" + institution + "/" + collection + "/"
+                        + assetGuid + "/" + file))
                 .header("Authorization", "Bearer " + token)
                 .DELETE()
                 .build();
@@ -1768,7 +1851,7 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction a_DELETE_request_is_sent_to_delete_temp_folder(){
+    public WhenAction a_DELETE_request_is_sent_to_delete_temp_folder() {
         getToken();
 
         request = HttpRequest.newBuilder()
@@ -1790,7 +1873,7 @@ public class WhenAction extends Stage<WhenAction> {
         Instant startTime = Instant.now();
         ObjectMapper OM = new ObjectMapper();
 
-        while(true){
+        while (true) {
             // Check:
             a_GET_request_is_sent_to_get_an_assets_status(assetGuid);
 
@@ -1799,16 +1882,16 @@ public class WhenAction extends Stage<WhenAction> {
             JsonNode rootNode = OM.readTree(responseBody);
             String status = rootNode.get("status").asText();
 
-            if (!status.matches("ERDA_SYNCHRONISED")){
+            if (!status.matches("ERDA_SYNCHRONISED")) {
                 logger.info("Erda hasn't synchronized yet. Trying again...");
             } else {
                 logger.info("Erda has synchronized.");
-                //a_GET_request_is_sent_to_get_an_assets_status("test-suite-asset-parent");
+                // a_GET_request_is_sent_to_get_an_assets_status("test-suite-asset-parent");
                 break;
             }
 
             Instant currentTime = Instant.now();
-            if(Duration.between(startTime, currentTime).compareTo(timeout) >= 0){
+            if (Duration.between(startTime, currentTime).compareTo(timeout) >= 0) {
                 logger.error("Timeout. Not attempting to synchronize anymore.");
                 break;
             }
@@ -1830,12 +1913,13 @@ public class WhenAction extends Stage<WhenAction> {
         Instant startTime = Instant.now();
         ObjectMapper OM = new ObjectMapper();
 
-        while(true){
+        while (true) {
 
-            // wait first to allow status change to happen, when updating data for an already specify synced asset
+            // wait first to allow status change to happen, when updating data for an
+            // already specify synced asset
             Instant currentTime = Instant.now();
-            if(Duration.between(startTime, currentTime).compareTo(timeout) >= 0){
-                logger.error("Timeout. Not attempting to synchronize anymore.");
+            if (Duration.between(startTime, currentTime).compareTo(timeout) >= 0) {
+                logger.error("Timeout. Not tracking synchronization anymore.");
                 break;
             }
             try {
@@ -1852,11 +1936,11 @@ public class WhenAction extends Stage<WhenAction> {
             JsonNode rootNode = OM.readTree(responseBody);
             String status = rootNode.get("status").asText();
 
-            if (!status.matches("SPECIFY_SYNCHRONISED")){
+            if (!status.matches("SPECIFY_SYNCHRONISED")) {
                 logger.info("Specify hasn't synchronized yet. Trying again...");
             } else {
                 logger.info("Specify has synchronized.");
-        
+
                 break;
             }
 
@@ -1864,24 +1948,27 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction specimen_is_in_specify(String collection_object_id) throws JSONException, JsonProcessingException{
+    public WhenAction specimen_is_in_specify(String collection_object_id)
+            throws JSONException, JsonProcessingException {
         String response = null;
         try {
             response = specifyClient.get("collectionobject", null).filter("id", collection_object_id).executeGetBody();
-            
-        } catch (Exception e){
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
         this.compareResult = specify_has_field_value_in_response(response, "meta.total_count", "1");
         return self();
     }
 
-    public WhenAction get_and_compare_specify_data_with_model_data(String collection_object_id, UpdateMetadata updateMetadata) throws JSONException, JsonProcessingException{
+    public WhenAction get_and_compare_specify_data_with_model_data(String collection_object_id,
+            UpdateMetadata updateMetadata) throws JSONException, JsonProcessingException {
         String response = null;
         try {
-            response = specifyClient.get("collectionobjectattachment", null).filter("collectionobject_id", collection_object_id).limit(10).executeGetBody();
-            
-        } catch (Exception e){
+            response = specifyClient.get("collectionobjectattachment", null)
+                    .filter("collectionobject_id", collection_object_id).limit(10).executeGetBody();
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
         // logger.info(response);
@@ -1898,7 +1985,6 @@ public class WhenAction extends Stage<WhenAction> {
         String license = legality.getLicense();
         String credit = legality.getCredit();
 
-
         Map<String, String> valueList = new HashMap<String, String>();
 
         valueList.put("title", title);
@@ -1909,13 +1995,15 @@ public class WhenAction extends Stage<WhenAction> {
         valueList.put("credit", credit);
         valueList.put("license", license);
         valueList.put("ispublic", isPublic);
-        // valueList.put("filecreateddate", token); // maybe only the date, not timestamp // add this later
+        // valueList.put("filecreateddate", token); // maybe only the date, not
+        // timestamp // add this later
 
         for (Map.Entry<String, String> entry : valueList.entrySet()) {
             String key = entry.getKey();
             String expectedValue = entry.getValue();
             logger.info(key + " : " + expectedValue);
-            Boolean currentResult = specify_has_field_value_in_response(response, ("objects[0].attachment." + key), expectedValue);
+            Boolean currentResult = specify_has_field_value_in_response(response, ("objects[0].attachment." + key),
+                    expectedValue);
             if (!currentResult) {
                 logger.info("Failed comparison for: " + key + " :: " + expectedValue);
                 this.compareResult = false;
@@ -1926,12 +2014,14 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public WhenAction get_and_compare_specify_updated_data_with_model_data(String collection_object_id, UpdateMetadata updateMetadata) throws JSONException, JsonProcessingException{
+    public WhenAction get_and_compare_specify_updated_data_with_model_data(String collection_object_id,
+            UpdateMetadata updateMetadata) throws JSONException, JsonProcessingException {
         String response = null;
         try {
-            response = specifyClient.get("collectionobjectattachment", null).filter("collectionobject_id", collection_object_id).limit(10).executeGetBody();
-            
-        } catch (Exception e){
+            response = specifyClient.get("collectionobjectattachment", null)
+                    .filter("collectionobject_id", collection_object_id).limit(10).executeGetBody();
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -1949,47 +2039,55 @@ public class WhenAction extends Stage<WhenAction> {
             String key = entry.getKey();
             String expectedValue = entry.getValue();
 
-            if (!key.equals("mime_type")){
-            
-                Boolean currentResult = specify_has_field_value_in_response(response, "objects[0].attachment." + key, expectedValue);
+            if (!key.equals("mime_type")) {
+
+                Boolean currentResult = specify_has_field_value_in_response(response, "objects[0].attachment." + key,
+                        expectedValue);
                 if (!currentResult) {
                     this.compareResult = false;
                     return self();
                 }
-            }    
+            }
         }
         this.compareResult = true;
         return self();
     }
 
-    public WhenAction a_DELETE_request_is_sent_to_delete_an_attachment_from_a_speciment(String collection_object_id) throws JSONException, JsonProcessingException{
+    // Specify api is bugged so this wont work. We have to deattach the attachment
+    // from the collectionobjectattachment and then the collectionobjectattachment
+    // from the collectionobject to "delete" from specify.
+    public WhenAction a_DELETE_request_is_sent_to_delete_an_attachment_from_a_speciment(String collection_object_id)
+            throws JSONException, JsonProcessingException {
         List<Map<String, Object>> response = new ArrayList<>();
         int attachmentId = -1;
         try {
-            response = this.specifyClient.get("collectionobjectattachment", null).filter("collectionobject_id", collection_object_id).limit(2).execute();
-            
-        } catch (Exception e){
+            response = this.specifyClient.get("collectionobjectattachment", null)
+                    .filter("collectionobject_id", collection_object_id).limit(2).execute();
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        if (response.size() != 1){
-            logger.info("Found either multiple attachments or 0 attachments for specimen with collectionobject_id = " + collection_object_id + ". There should be 1 attachment.");
+        if (response.size() != 1) {
+            logger.info("Found either multiple attachments or 0 attachments for specimen with collectionobject_id = "
+                    + collection_object_id + ". There should be 1 attachment.");
             this.compareResult = false;
             return self();
         }
-        
-        try{
+
+        try {
             Object attachmentObj = response.get(0).get("attachment");
+
             if (attachmentObj instanceof Map) {
                 Map<String, Object> attachmentMap = (Map<String, Object>) attachmentObj;
-                attachmentId = (Integer)attachmentMap.get("id");
-                
+                Number attachmentNumber = (Number) attachmentMap.get("id");
+                attachmentId = attachmentNumber.intValue();
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        if (attachmentId == -1){
+        if (attachmentId == -1) {
             logger.info("Failed to get the attachment id from specify");
             this.compareResult = false;
             return self();
@@ -1997,8 +2095,8 @@ public class WhenAction extends Stage<WhenAction> {
 
         String strAttachmentId = Integer.toString(attachmentId);
 
-        try {            
-            this.specifyClient.delete(strAttachmentId).execute();        
+        try {
+            this.specifyClient.delete(strAttachmentId).execute();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -2008,41 +2106,139 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
+    public WhenAction deleting_from_specify_by_deattaching(String collection_object_id)
+            throws JSONException, JsonProcessingException {
 
-    // Helper functions: 
-    public HttpRequest postRequestBuilder(String entityType, String i_role, String c_role, String i_name, String c_name, String p_name, String w_name){
+        int collection_object_attachment_id = -1;
+        int collection_object_attachment_version = -1;
+        int collection_object_version = -1;
+        this.compareResult = false;
+
+        Map<String, Integer> mapIds = this.get_collectionobjectattachmentid_and_version_specify(collection_object_id);
+        
+        try {
+            collection_object_attachment_id = mapIds.get("collectionobjectattachment");
+            collection_object_attachment_version = mapIds.get("collectionObjectAttachmentVersion");
+            collection_object_version = mapIds.get("collectionObjectVersion");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (collection_object_attachment_id == -1 || collection_object_attachment_version == -1 || collection_object_version == -1) {
+            this.compareResult = false;
+            return self();
+        }
+
+        try {
+            this.compareResult = this.a_PUT_request_is_send_to_update_specify_objects(collection_object_id,
+                    "collectionobject", collection_object_version);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        /*
+        try {
+            this.compareResult = this.a_PUT_request_is_send_to_update_specify_objects(
+                    Integer.toString(collection_object_attachment_id), "collectionobjectattachment", collection_object_attachment_version);
+            if (this.compareResult == false) {
+                return self();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        */
+        return self();
+    }
+
+    public boolean a_PUT_request_is_send_to_update_specify_objects(String object_id, String type, int version)
+            throws JSONException, JsonProcessingException {
+        // logger.info("" + object_id + " " + type + " " + version);
+        boolean reply = false;
+        try {
+            reply = this.specifyClient.put(object_id, type, version).execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return reply;
+    }
+
+    public Map<String, Integer> get_collectionobjectattachmentid_and_version_specify(String collection_object_id)
+            throws JSONException, JsonProcessingException {
+
+        Map<String, Integer> map = new HashMap<String, Integer>();
+        String response = null;
+        try {
+            response = specifyClient.get("collectionobject", null).filter("id", collection_object_id).executeGetBody();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(response);
+
+        // Navigate to objects[0].collectionobjectattachments
+        JsonNode attachments = root.path("objects").get(0).path("collectionobjectattachments");
+
+        if (attachments.isArray() && attachments.size() == 1) {
+            JsonNode attachmentEntry = attachments.get(0);
+
+            int collectionObjectAttachmentId = attachmentEntry.path("id").asInt(-1);
+            int collectionObjectAttachmentVersion = attachmentEntry.path("version").asInt(-1);
+            int collectionObjectVersion = root.path("objects").get(0).path("version").asInt(-1);
+
+            map.put("collectionobjectattachment", collectionObjectAttachmentId);
+            map.put("collectionObjectAttachmentVersion", collectionObjectAttachmentVersion);
+            map.put("collectionObjectVersion", collectionObjectVersion);
+        } else {
+            logger.info("Expected exactly 1 attachment, but found " + attachments.size());
+        }
+
+        return map;
+    }
+
+    // Helper functions:
+    public HttpRequest postRequestBuilder(String entityType, String i_role, String c_role, String i_name, String c_name,
+            String p_name, String w_name) {
 
         HttpRequest.Builder newRequest = HttpRequest.newBuilder();
 
-        if (entityType.equals("institution")){
-            if (i_role.isEmpty()){
+        if (entityType.equals("institution")) {
+            if (i_role.isEmpty()) {
                 newRequest.uri(URI.create(assetServiceUrl + "/v1/institutions"))
                         .header("Content-Type", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + i_name +"\", \"roleRestrictions\": []}"));
+                        .POST(HttpRequest.BodyPublishers
+                                .ofString("{\"name\":\"" + i_name + "\", \"roleRestrictions\": []}"));
             } else {
                 newRequest.uri(URI.create(assetServiceUrl + "/v1/institutions"))
                         .header("Content-Type", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + i_name  +"\", \"roleRestrictions\": [{\"name\": \"" + i_role + "\"}]}"));
+                        .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + i_name
+                                + "\", \"roleRestrictions\": [{\"name\": \"" + i_role + "\"}]}"));
             }
-        } else if (entityType.equals("workstation")){
+        } else if (entityType.equals("workstation")) {
             newRequest.uri(URI.create(assetServiceUrl + "/v1/institutions/" + i_name + "/workstations"))
                     .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + w_name + "\", \"status\":\"IN_SERVICE\", \"institution_name\": \"" + i_name + "\"}"));
-        } else if (entityType.equals("pipeline")){
+                    .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + w_name
+                            + "\", \"status\":\"IN_SERVICE\", \"institution_name\": \"" + i_name + "\"}"));
+        } else if (entityType.equals("pipeline")) {
             newRequest.uri(URI.create(assetServiceUrl + "/v1/institutions/" + i_name + "/pipelines"))
                     .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + p_name + "\", \"institution\": \"" + i_name + "\"}"));
+                    .POST(HttpRequest.BodyPublishers
+                            .ofString("{\"name\":\"" + p_name + "\", \"institution\": \"" + i_name + "\"}"));
         } else if (entityType.equals("collection")) {
-            
-            if (c_role.isEmpty()){
+
+            if (c_role.isEmpty()) {
                 newRequest.uri(URI.create(assetServiceUrl + "/v1/institutions/" + i_name + "/collections"))
                         .header("Content-Type", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + c_name + "\", \"institution\": \"" + i_name + "\", \"roleRestrictions\": []}"));
-                        System.out.print("{\"name\":\"" + c_name + "\", \"institution\": \"" + i_name + "\", \"roleRestrictions\": []}");
+                        .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + c_name + "\", \"institution\": \""
+                                + i_name + "\", \"roleRestrictions\": []}"));
+                System.out.print(
+                        "{\"name\":\"" + c_name + "\", \"institution\": \"" + i_name + "\", \"roleRestrictions\": []}");
             } else {
                 newRequest.uri(URI.create(assetServiceUrl + "/v1/institutions/" + i_name + "/collections"))
                         .header("Content-Type", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + c_name + "\", \"institution\": \"" + i_name + "\", \"roleRestrictions\": [{ \"name\": \"" + c_role + "\"}]}"));
+                        .POST(HttpRequest.BodyPublishers.ofString("{\"name\":\"" + c_name + "\", \"institution\": \""
+                                + i_name + "\", \"roleRestrictions\": [{ \"name\": \"" + c_role + "\"}]}"));
             }
         }
 
@@ -2052,20 +2248,20 @@ public class WhenAction extends Stage<WhenAction> {
         return newRequest.build();
     }
 
-    public HttpRequest getRequestBuilder(String entityType, String institution){
+    public HttpRequest getRequestBuilder(String entityType, String institution) {
 
         HttpRequest.Builder newRequest = HttpRequest.newBuilder();
 
-        if (entityType.equals("institution")){
+        if (entityType.equals("institution")) {
             newRequest.uri(URI.create(assetServiceUrl + "/v1/institutions"))
                     .GET();
-        } else if (entityType.equals("workstation")){
+        } else if (entityType.equals("workstation")) {
             newRequest.uri(URI.create(assetServiceUrl + "/v1/institutions/" + institution + "/workstations"))
                     .GET();
-        } else if(entityType.equals("pipeline")){
+        } else if (entityType.equals("pipeline")) {
             newRequest.uri(URI.create(assetServiceUrl + "/v1/institutions/" + institution + "/pipelines"))
                     .GET();
-        } else if(entityType.equals("collection")){
+        } else if (entityType.equals("collection")) {
             newRequest.uri(URI.create(assetServiceUrl + "/v1/institutions/" + institution + "/collections"))
                     .GET();
         }
@@ -2081,7 +2277,7 @@ public class WhenAction extends Stage<WhenAction> {
 
     public boolean getResponseArray() throws JSONException {
         JSONArray jsonArray = new JSONArray(response.body());
-        if (jsonArray.length() > 0){
+        if (jsonArray.length() > 0) {
             return true;
         }
         return false;
@@ -2092,14 +2288,14 @@ public class WhenAction extends Stage<WhenAction> {
         return jsonArray.length();
     }
 
-    public String getHttpAllocationStatus(){
+    public String getHttpAllocationStatus() {
         String httpInfoStatus = "";
 
-        try{
+        try {
             JSONObject jsonResponse = new JSONObject(response.body());
             JSONObject httpInfo = jsonResponse.getJSONObject("httpInfo");
             httpInfoStatus = httpInfo.getString("http_allocation_status");
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -2114,7 +2310,7 @@ public class WhenAction extends Stage<WhenAction> {
 
         try {
 
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -2122,34 +2318,34 @@ public class WhenAction extends Stage<WhenAction> {
 
     }
 
-    public String getInternalStatus(){
+    public String getInternalStatus() {
         String internalStatus = "";
 
         try {
             JSONObject jsonResponse = new JSONObject(response.body());
             internalStatus = jsonResponse.getString("internal_status");
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return internalStatus;
     }
 
-    public String getStatus(){
+    public String getStatus() {
 
         String status = "";
 
         try {
             JSONObject jsonResponse = new JSONObject(response.body());
             status = jsonResponse.getString("status");
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return status;
     }
 
-    public void getToken(){
+    public void getToken() {
 
         // Parameters for getting the Token.
         Map<String, String> requestBodyParams = new HashMap<>();
@@ -2182,7 +2378,7 @@ public class WhenAction extends Stage<WhenAction> {
         }
     }
 
-    public void getReadRole1Token(){
+    public void getReadRole1Token() {
 
         // Parameters for getting the Token.
         Map<String, String> requestBodyParams = new HashMap<>();
@@ -2215,7 +2411,7 @@ public class WhenAction extends Stage<WhenAction> {
         }
     }
 
-    public void getWriteRole1Token(){
+    public void getWriteRole1Token() {
 
         // Parameters for getting the Token.
         Map<String, String> requestBodyParams = new HashMap<>();
@@ -2248,60 +2444,60 @@ public class WhenAction extends Stage<WhenAction> {
         }
     }
 
-    public void makeApiCall(HttpRequest request){
+    public void makeApiCall(HttpRequest request) {
         try {
             response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             // logger.info(response.body());
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public WhenAction compare_model_data_to_asset_in_ars(String model){
+    public WhenAction compare_model_data_to_asset_in_ars(String model) {
 
         try {
-            
-            JsonNode model_data = convert_json_to_node(model); 
-            
-            String assetGuid = model_data.get("asset_guid").textValue();
-            
-            String ars_asset = get_asset_metadata(assetGuid);
-            
-            JsonNode asset_data = convert_json_to_node(ars_asset);
-            
-            this.compareResult =  model_and_asset_data_match(model_data, asset_data);
-            
-        } catch (Exception e){
-            e.printStackTrace();
-        }
 
-        return self();
-    }
-    
-    public WhenAction compare_update_data_to_asset_in_ars(String model){
+            JsonNode model_data = convert_json_to_node(model);
 
-        try {
-            
-            JsonNode model_data = convert_json_to_node(model); 
-            
             String assetGuid = model_data.get("asset_guid").textValue();
-            
+
             String ars_asset = get_asset_metadata(assetGuid);
-            
+
             JsonNode asset_data = convert_json_to_node(ars_asset);
-            
-            this.compareResult =  model_and_asset_data_match(model_data, asset_data);
-            
-        } catch (Exception e){
+
+            this.compareResult = model_and_asset_data_match(model_data, asset_data);
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return self();
     }
 
-    public WhenAction update_asset_from_model(String model, String assetGuid){
+    public WhenAction compare_update_data_to_asset_in_ars(String model) {
 
-        getToken();        
+        try {
+
+            JsonNode model_data = convert_json_to_node(model);
+
+            String assetGuid = model_data.get("asset_guid").textValue();
+
+            String ars_asset = get_asset_metadata(assetGuid);
+
+            JsonNode asset_data = convert_json_to_node(ars_asset);
+
+            this.compareResult = model_and_asset_data_match(model_data, asset_data);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return self();
+    }
+
+    public WhenAction update_asset_from_model(String model, String assetGuid) {
+
+        getToken();
 
         request = HttpRequest.newBuilder()
                 .uri(URI.create(assetServiceUrl + "/v1/assetmetadata/" + assetGuid))
@@ -2315,20 +2511,20 @@ public class WhenAction extends Stage<WhenAction> {
         return self();
     }
 
-    public String get_asset_metadata(String assetGuid){
+    public String get_asset_metadata(String assetGuid) {
 
         getToken();
-        
+
         try {
             String uriString = assetServiceUrl + "/v1/assetmetadata/" + assetGuid;
-            
+
             request = HttpRequest.newBuilder()
                     .uri(URI.create(uriString))
                     .header("Content-Type", "application/json")
                     .header("Authorization", "Bearer " + token)
                     .GET()
                     .build();
-        } catch(Exception e) {
+        } catch (Exception e) {
             logger.error("Error while creating URI: " + e.getMessage(), e);
             throw e;
         }
@@ -2336,13 +2532,13 @@ public class WhenAction extends Stage<WhenAction> {
             response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             // logger.info(response.body());
             return response.body();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return response.body();
-    }   
+    }
 
-    public JsonNode convert_json_to_node(String json) throws IOException{
+    public JsonNode convert_json_to_node(String json) throws IOException {
         JsonNode node = objectMapper.readTree(json);
         return node;
     }
@@ -2352,23 +2548,25 @@ public class WhenAction extends Stage<WhenAction> {
      *
      * @param model The first JSON is the model.
      * @param asset The second JSON is the asset gotten from ARS.
-     * @return true if for every key that exists in both nodes the values are identical, false otherwise.
+     * @return true if for every key that exists in both nodes the values are
+     *         identical, false otherwise.
      */
     public Boolean model_and_asset_data_match(JsonNode model, JsonNode asset) {
-        
+
         if (model.isObject() && asset.isObject()) {
             Iterator<Map.Entry<String, JsonNode>> fields = model.fields();
-            
+
             while (fields.hasNext()) {
                 Map.Entry<String, JsonNode> entry = fields.next();
                 String key = entry.getKey();
 
-                // Only compare if the key exists in both nodes - and not automatic updates comes from ARS
-                if (asset.has(key) && 
-                    !key.equals("date_metadata_updated") && 
-                    !key.equals("updateUser") && 
-                    !key.equals("metadata_created_by") && 
-                    !key.equals("metadata_updated_by")) {
+                // Only compare if the key exists in both nodes - and not automatic updates
+                // comes from ARS
+                if (asset.has(key) &&
+                        !key.equals("date_metadata_updated") &&
+                        !key.equals("updateUser") &&
+                        !key.equals("metadata_created_by") &&
+                        !key.equals("metadata_updated_by")) {
 
                     JsonNode value1 = entry.getValue();
                     JsonNode value2 = asset.get(key);
@@ -2379,7 +2577,8 @@ public class WhenAction extends Stage<WhenAction> {
                             Instant instant1 = Instant.parse(value1.asText());
                             Instant instant2 = Instant.parse(value2.asText());
                             if (!instant1.equals(instant2)) {
-                                logger.error("Difference in Instant for key: " + key + " Model value: " + instant1 + " ARS value: " + instant2);
+                                logger.error("Difference in Instant for key: " + key + " Model value: " + instant1
+                                        + " ARS value: " + instant2);
                                 return false;
                             }
                             continue; // skip recursive call
@@ -2388,20 +2587,22 @@ public class WhenAction extends Stage<WhenAction> {
                             return false;
                         }
                     }
-                    
+
                     // handle arrays containing same objects but in different order
                     if (model.isArray() && asset.isArray()) {
                         ArrayNode array1 = (ArrayNode) model;
                         ArrayNode array2 = (ArrayNode) asset;
 
-                        if (array1.size() != array2.size()) return false;
+                        if (array1.size() != array2.size())
+                            return false;
 
                         List<JsonNode> list1 = new ArrayList<>();
                         List<JsonNode> list2 = new ArrayList<>();
                         array1.forEach(list1::add);
                         array2.forEach(list2::add);
 
-                        // Match elements from list1 with any in list2 (remove matched to avoid duplicates)
+                        // Match elements from list1 with any in list2 (remove matched to avoid
+                        // duplicates)
                         for (JsonNode node1 : list1) {
                             boolean matchFound = false;
                             Iterator<JsonNode> it = list2.iterator();
@@ -2417,23 +2618,24 @@ public class WhenAction extends Stage<WhenAction> {
                                 logger.error("No matching element found for array item: " + node1);
                                 return false;
                             }
-                        }                        
+                        }
 
-                    // Recurse for other types
-                    if (!model_and_asset_data_match(value1, value2)) {
-                        logger.error("Difference found for key: " + key + " Model value: " + value1 + " ARS value: " + value2);
-                        return false;
+                        // Recurse for other types
+                        if (!model_and_asset_data_match(value1, value2)) {
+                            logger.error("Difference found for key: " + key + " Model value: " + value1 + " ARS value: "
+                                    + value2);
+                            return false;
+                        }
                     }
                 }
             }
-        }
             return true;
-            
+
         }
         // For other types (string, number, boolean, null), compare them directly
         else {
             return model.equals(asset);
-            }        
+        }
     }
 
     public Boolean specify_has_field_value_in_response(String response, String keyPath, String expectedValue) {
@@ -2449,23 +2651,27 @@ public class WhenAction extends Stage<WhenAction> {
                 if (part.contains("[") && part.contains("]")) {
                     String fieldName = part.substring(0, part.indexOf("["));
                     int index = Integer.parseInt(part.substring(part.indexOf("[") + 1, part.indexOf("]")));
-                    if (!current.getAsJsonObject().has(fieldName)) return false;
+                    if (!current.getAsJsonObject().has(fieldName))
+                        return false;
                     JsonArray array = current.getAsJsonObject().getAsJsonArray(fieldName);
-                    if (array.size() <= index) return false;
+                    if (array.size() <= index)
+                        return false;
                     current = array.get(index);
                 } else {
-                    if (!current.getAsJsonObject().has(part)) return false;
+                    if (!current.getAsJsonObject().has(part))
+                        return false;
                     current = current.getAsJsonObject().get(part);
                 }
             }
 
             // At this point, current should be the final value
-            if (current.isJsonNull()) return expectedValue == null;
+            if (current.isJsonNull())
+                return expectedValue == null;
 
             String actualValue = current.getAsString();
-            
+
             if (expectedValue.equals(actualValue)) {
-                
+
                 return true;
             } else {
                 logger.info(actualValue + " : " + expectedValue + " failed to match for " + keyPath);
@@ -2476,5 +2682,10 @@ public class WhenAction extends Stage<WhenAction> {
             System.err.println("Failed to check nested key path: " + e.getMessage());
             return false;
         }
+    }
+
+    public String get_attachmentid_specify(String collection_object_attachment_id) {
+
+        return null;
     }
 }
