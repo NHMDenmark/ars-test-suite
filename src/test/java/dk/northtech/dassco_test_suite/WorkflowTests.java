@@ -106,5 +106,4 @@ public class WorkflowTests extends BaseTest<GivenState, WhenAction, ThenOutcome>
 				.and().asset_internal_status_is_metadata_received(when().getInternalStatus());
 	}
 
-
 }

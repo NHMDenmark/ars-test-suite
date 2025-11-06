@@ -1,20 +1,20 @@
 package dk.northtech.dassco_test_suite.metadata_model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Builder;
-
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class UpdateMetadata{
-    // from metadata version 3.0.2
+    // from metadata version 3.0.4
     private String asset_created_by;
     private String asset_deleted_by;
     private String asset_guid;
@@ -56,7 +56,6 @@ public class UpdateMetadata{
     private String metadata_source;
     private String metadata_updated_by;
     private String metadata_version;
-    private String mime_type;
     private String mos_id;
     private boolean multi_specimen;
     @Builder.Default

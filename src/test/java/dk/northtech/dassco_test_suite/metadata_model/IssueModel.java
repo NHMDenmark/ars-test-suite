@@ -20,7 +20,7 @@ public class IssueModel {
     @Builder.Default
     private String description = null;
     @Builder.Default
-    private String note = null;
+    private String notes = null;
     @Builder.Default
     private boolean solved = false;
 }

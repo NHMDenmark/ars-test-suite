@@ -271,5 +271,4 @@ public class SpecifyTests extends BaseTest<GivenState, WhenAction, ThenOutcome>{
         when().a_DELETE_request_is_sent_to_delete_an_assets_metadata(this.bridge_asset_guid);
         then().response_is_204(when().getStatusCode());
     }
-
 }
